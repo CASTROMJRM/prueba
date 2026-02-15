@@ -1,0 +1,86 @@
+.wrap {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.brand {
+  padding: 14px 12px;
+}
+
+.brandTitle {
+  display: block;
+  font-family: var(--font-display, "Bebas Neue", cursive);
+  letter-spacing: 2px;
+  font-size: 28px;
+}
+
+.brandSub {
+  opacity: 0.75;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* 👈 aquí se alinea PANEL con ADMIN */
+  line-height: 1.05;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.active {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #fff;
+}
+
+.icon {
+  width: 18px;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* New styles for brand link and logo */
+.brandLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start; /* 👈 en vez de center */
+  text-decoration: none;
+}
+
+.brandLogo {
+  width: 200;
+  height: 50px;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0) invert(1);
+}

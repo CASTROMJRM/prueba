@@ -1,0 +1,40 @@
+.page {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+}
+
+.page h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.page p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.grid {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.card {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--primary) 5%, var(--white));
+}
+
+.card p {
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.card strong {
+  font-size: 1.05rem;
+}
