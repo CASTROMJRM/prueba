@@ -1,0 +1,1682 @@
+/* ============================================
+   IMPORTAR FUENTES
+   ============================================ */
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+/* ============================================
+   BASE & RESET
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+.page-container {
+  min-height: 100vh;
+  background: #ffffff;
+  color: #1a1a1a;
+  overflow-x: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   BACKGROUND ANIMATIONS
+   ============================================ */
+.bg-animation {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    rgba(239, 68, 68, 0.05) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+
+.bg-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+}
+
+.bg-glow-1 {
+  top: 0;
+  left: 25%;
+  width: 384px;
+  height: 384px;
+  background: rgba(239, 68, 68, 0.08);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.bg-glow-2 {
+  bottom: 0;
+  right: 25%;
+  width: 384px;
+  height: 384px;
+  background: rgba(239, 68, 68, 0.05);
+  animation: pulse 4s ease-in-out infinite 1s;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.1);
+  }
+}
+
+/* ============================================
+   ESTILOS DE TEXTO CON BEBAS NEUE
+   ============================================ */
+.brush-text {
+  font-family: "Bebas Neue", cursive;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  line-height: 1.1;
+  color: #ffffff;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.brush-title {
+  font-family: "Bebas Neue", cursive;
+  font-weight: 400;
+  font-size: 52px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.brush-btn {
+  font-family: "Bebas Neue", cursive;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================
+   HEADER - MEJOR DISTRIBUCIÓN
+   ============================================ */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 90px;
+}
+
+.header-scrolled {
+  background: rgba(255, 255, 255, 0.99);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+}
+
+.header-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 90px;
+}
+
+.logo-container {
+  flex-shrink: 0;
+}
+
+.logo-image {
+  height: 50px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.logo-image:hover {
+  transform: scale(1.05);
+}
+
+/* Navigation - Distribución mejorada */
+.nav-desktop {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+  justify-content: space-between;
+  margin-left: 3rem;
+}
+
+.nav-main-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-action-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1a1a1a;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 0.5rem 0;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nav-link:hover {
+  color: #ef4444;
+  transform: translateY(-1px);
+}
+
+.nav-link svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover svg {
+  transform: scale(1.1);
+}
+
+.nav-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #ef4444;
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.nav-link:hover .nav-underline {
+  width: 100%;
+}
+
+.nav-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons - Estilo consistente */
+.slider-btn-outline,
+.slider-btn-solid {
+  padding: 12px 32px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid #db421c;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.slider-btn-outline {
+  background: transparent;
+  color: #db421c;
+}
+
+.slider-btn-outline:hover {
+  background: #dc2c1e;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.slider-btn-solid {
+  background: #ef4444;
+  color: white;
+}
+
+.slider-btn-solid:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #1a1a1a;
+  cursor: pointer;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-btn:hover {
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+.mobile-menu-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 2rem;
+}
+
+.mobile-nav-link {
+  padding: 1rem 0;
+  color: #1a1a1a;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  font-family: "Poppins", sans-serif;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-transform: uppercase;
+}
+
+.mobile-nav-link:hover {
+  color: #ef4444;
+  transform: translateX(5px);
+}
+
+.mobile-nav-link:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.mobile-nav-buttons .slider-btn-outline,
+.mobile-nav-buttons .slider-btn-solid {
+  text-align: center;
+  justify-content: center;
+}
+
+/* ============================================
+   BREADCRUMBS
+   ============================================ */
+.breadcrumbs {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 0;
+  padding-top: 110px;
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-family: "Inter", sans-serif;
+  color: #666666;
+  flex-wrap: wrap;
+  list-style: none;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.breadcrumb-link {
+  color: #000000;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.breadcrumb-link:hover {
+  color: #ce0000;
+}
+
+.breadcrumb-link svg {
+  width: 14px;
+  height: 14px;
+}
+
+.breadcrumb-separator {
+  color: #cccccc;
+}
+
+.breadcrumb-current {
+  color: #ef4444;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   SLIDER - HERO SLIDER CON BEBAS NEUE
+   ============================================ */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  min-height: 600px;
+  max-height: 800px;
+  overflow: hidden;
+  background-color: #000;
+  margin-top: 0;
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
+    url("../assets/SliderTitanuim.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.slide-active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.slide-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: rgb(255, 255, 255);
+}
+
+.slide-label {
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+  color: #e31c25;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.slide-title {
+  font-size: 96px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.slide-subtitle {
+  font-size: 64px;
+  font-weight: 400;
+  color: #e31c25;
+  margin: 0;
+  margin-bottom: 2rem;
+  line-height: 1.1;
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.slide-description {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  line-height: 1.7;
+  max-width: 700px;
+  margin-bottom: 3rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 400;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.slide-buttons {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: #e31c25;
+  color: white;
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 2px solid white;
+}
+
+.slider-arrow:hover {
+  background-color: #dc2626;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6);
+}
+
+.slider-arrow svg {
+  width: 28px;
+  height: 28px;
+}
+
+.slider-arrow-left {
+  left: 2rem;
+}
+
+.slider-arrow-right {
+  right: 2rem;
+}
+
+.slider-dots {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  z-index: 10;
+}
+
+.slider-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.slider-dot:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
+}
+
+.slider-dot-active {
+  background-color: #ef4444;
+  border-color: #ef4444;
+  width: 40px;
+  border-radius: 8px;
+  transform: scale(1.1);
+}
+
+/* ============================================
+   FEATURES SECTION
+   ============================================ */
+.features-section {
+  position: relative;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8rem 1rem;
+  z-index: 1;
+}
+
+.features-header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.features-title {
+  font-family: "Bebas Neue", cursive;
+  font-weight: 400;
+  font-size: 52px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1rem;
+}
+
+.features-subtitle {
+  font-family: "Inter", sans-serif;
+  color: #666666;
+  max-width: 768px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-size: 20px;
+}
+
+.features-grid {
+  display: grid;
+  gap: 2.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature-card {
+  position: relative;
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feature-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(239, 68, 68, 0.1),
+    transparent
+  );
+  border-radius: 20px;
+  filter: blur(20px);
+  transition: filter 0.3s ease;
+}
+
+.feature-card:hover .feature-glow {
+  filter: blur(30px);
+}
+
+.feature-content {
+  position: relative;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  background: #ffffff;
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  height: 100%;
+}
+
+.feature-card:hover .feature-content {
+  border-color: rgba(239, 68, 68, 0.3);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.2);
+}
+
+.feature-inner {
+  display: flex;
+  align-items: start;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.feature-icon {
+  flex-shrink: 0;
+  padding: 1.2rem;
+  border-radius: 16px;
+  background: linear-gradient(to bottom right, #e31c25, #b91c1c);
+  color: #fff;
+  box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  box-shadow: 0 15px 45px rgba(239, 68, 68, 0.6);
+  transform: scale(1.1);
+}
+
+.feature-text {
+  flex: 1;
+}
+
+.feature-title {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+.feature-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 1.1rem;
+  color: #666666;
+  line-height: 1.6;
+}
+
+/* ============================================
+   STATS SECTION - ACTUALIZADA
+   ============================================ */
+.stats-section {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 6rem 1rem;
+  margin: 4rem auto;
+  border-radius: 30px;
+  max-width: 1280px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-item {
+  color: white;
+}
+
+.stat-value {
+  font-size: 80px;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.stat-label {
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ============================================
+   CTA SECTION - DISEÑO HORIZONTAL (CORREGIDO)
+   ============================================ */
+.cta-section {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 4rem 1rem;
+  z-index: 1;
+}
+
+.cta-card-horizontal {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  min-height: 320px;
+}
+
+.cta-bg-1 {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(239, 68, 68, 0.2),
+    transparent,
+    rgba(239, 68, 68, 0.1)
+  );
+}
+
+.cta-bg-2 {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at top right,
+    rgba(239, 68, 68, 0.25),
+    transparent 60%
+  );
+}
+
+.cta-content-horizontal {
+  position: relative;
+  padding: 3rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  min-height: 320px;
+}
+
+.cta-text-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cta-title {
+  font-size: 52px;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  letter-spacing: 3px;
+  line-height: 1.1;
+  font-family: "Bebas Neue", cursive;
+  color: #ffffff;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.cta-title-sub {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 24px;
+  font-family: "Poppins", sans-serif;
+  margin-bottom: 1rem;
+}
+
+.cta-description {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  max-width: 600px;
+}
+
+.cta-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+}
+
+.benefit-icon {
+  width: 18px;
+  height: 18px;
+  color: #ef4444;
+}
+
+.cta-buttons-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cta-buttons-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 250px;
+}
+
+.cta-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  background: #ef4444;
+  color: #fff;
+  font-family: "Bebas Neue", cursive;
+  font-weight: 400;
+  text-decoration: none;
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.4);
+  transition: all 0.3s ease;
+  border: 2px solid #ef4444;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.cta-btn-primary:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.6);
+  transform: translateY(-2px);
+}
+
+.cta-btn-primary:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+.btn-arrow {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.cta-btn-secondary {
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.cta-btn-secondary:hover {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   NEW FOOTER - SMART FIT STYLE
+   ============================================ */
+.smart-footer {
+  background: linear-gradient(135deg, #000000 0%, #000000 100%);
+  color: white;
+  margin-top: auto;
+}
+
+.footer-main {
+  padding: 4rem 0 2rem;
+}
+
+.footer-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 4rem;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.footer-logo {
+  height: 60px;
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+
+.social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.follow-text {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  color: #ef4444;
+}
+
+.social-icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.social-icon:hover {
+  background: #ef4444;
+  transform: translateY(-2px);
+}
+
+.social-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.footer-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+}
+
+.footer-column-title {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 1.5rem;
+  color: #e31c25;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  position: relative;
+  padding-left: 0;
+}
+
+.footer-link:hover {
+  color: #ef4444;
+  padding-left: 8px;
+}
+
+.footer-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 2px;
+  background: #ef4444;
+  transition: width 0.3s ease;
+}
+
+.footer-link:hover::before {
+  width: 4px;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.footer-bottom-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.footer-disclaimer {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.footer-copyright {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.text-white {
+  color: #fff;
+}
+
+.text-red {
+  color: #e31c25 !important;
+}
+
+.w-6 {
+  width: 1.5rem;
+}
+
+.h-6 {
+  height: 1.5rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1024px) {
+  .nav-desktop {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  .hero-slider {
+    height: 70vh;
+    min-height: 500px;
+    max-height: 600px;
+  }
+
+  .slide-title {
+    font-size: 72px;
+  }
+
+  .slide-subtitle {
+    font-size: 48px;
+  }
+
+  .features-title {
+    font-size: 42px;
+  }
+
+  .stats-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .stat-value {
+    font-size: 64px;
+  }
+
+  .cta-content-horizontal {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+    padding: 2.5rem;
+  }
+
+  .cta-title {
+    font-size: 42px;
+  }
+
+  .cta-buttons-vertical {
+    min-width: auto;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .footer-columns {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 1.5rem;
+  }
+
+  .breadcrumbs {
+    padding-top: 100px;
+  }
+
+  .slide-title {
+    font-size: 52px;
+  }
+
+  .slide-subtitle {
+    font-size: 36px;
+  }
+
+  .slide-description {
+    font-size: 18px;
+  }
+
+  .slide-label {
+    font-size: 16px;
+  }
+
+  .slider-arrow {
+    width: 50px;
+    height: 50px;
+  }
+
+  .slider-arrow svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .slider-arrow-left {
+    left: 1rem;
+  }
+
+  .slider-arrow-right {
+    right: 1rem;
+  }
+
+  .slider-dots {
+    bottom: 2rem;
+  }
+
+  .slide-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .slider-btn-solid,
+  .slider-btn-outline {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+  }
+
+  .slide-content {
+    padding: 0 1.5rem;
+  }
+
+  .features-section {
+    padding: 6rem 1rem;
+  }
+
+  .features-title {
+    font-size: 36px;
+  }
+
+  .stats-container {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .stat-value {
+    font-size: 56px;
+  }
+
+  .cta-section {
+    padding: 3rem 1rem;
+  }
+
+  .cta-content-horizontal {
+    padding: 2rem;
+    min-height: 280px;
+  }
+
+  .cta-title {
+    font-size: 36px;
+  }
+
+  .cta-title-sub {
+    font-size: 20px;
+  }
+
+  .cta-description {
+    font-size: 16px;
+  }
+
+  .cta-benefits {
+    gap: 1rem;
+  }
+
+  .benefit-item {
+    font-size: 13px;
+  }
+
+  .cta-btn-primary,
+  .cta-btn-secondary {
+    padding: 0.875rem 1.5rem;
+    font-size: 16px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+
+  .footer-columns {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer-content {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 0 1rem;
+  }
+
+  .logo-image {
+    height: 40px;
+  }
+
+  .breadcrumbs {
+    padding-top: 90px;
+  }
+
+  .hero-slider {
+    height: 60vh;
+    min-height: 450px;
+  }
+
+  .slide-title {
+    font-size: 42px;
+  }
+
+  .slide-subtitle {
+    font-size: 28px;
+  }
+
+  .slide-description {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .slide-label {
+    font-size: 14px;
+  }
+
+  .slider-btn-solid,
+  .slider-btn-outline {
+    padding: 14px 28px;
+    font-size: 14px;
+  }
+
+  .features-title {
+    font-size: 32px;
+  }
+
+  .features-subtitle {
+    font-size: 18px;
+  }
+
+  .feature-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .feature-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .stats-section {
+    padding: 4rem 1rem;
+  }
+
+  .stat-value {
+    font-size: 48px;
+  }
+
+  .stat-label {
+    font-size: 16px;
+  }
+
+  .cta-section {
+    padding: 2rem 1rem;
+  }
+
+  .cta-content-horizontal {
+    padding: 1.5rem;
+  }
+
+  .cta-title {
+    font-size: 32px;
+  }
+
+  .cta-title-sub {
+    font-size: 18px;
+  }
+
+  .cta-buttons-vertical {
+    gap: 0.75rem;
+  }
+
+  .footer-main {
+    padding: 3rem 0 1.5rem;
+  }
+
+  .footer-content {
+    padding: 0 1rem;
+  }
+
+  .footer-text {
+    font-size: 14px;
+  }
+
+  /* ============================================
+   TRAINERS SECTION - NUEVA SECCIÓN
+   ============================================ */
+  .trainers-section {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 6rem 1rem;
+    z-index: 1;
+  }
+
+  .trainers-container {
+    width: 100%;
+  }
+
+  .trainers-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .trainers-title {
+    font-family: "Bebas Neue", cursive;
+    font-weight: 400;
+    font-size: 52px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1.5rem;
+  }
+
+  .trainers-subtitle {
+    font-family: "Inter", sans-serif;
+    color: #666666;
+    max-width: 768px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-size: 18px;
+    margin-bottom: 2rem;
+  }
+
+  .trainers-divider {
+    height: 2px;
+    width: 100px;
+    background: #ef4444;
+    margin: 0 auto;
+  }
+
+  .trainers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .trainer-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .trainer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+
+  .trainer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .trainer-name {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .trainer-specialty {
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #ef4444;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .trainer-description {
+    font-family: "Inter", sans-serif;
+    font-size: 1rem;
+    color: #666666;
+    line-height: 1.5;
+  }
+
+  /* ============================================
+   PROGRESSION SECTION - NUEVA SECCIÓN
+   ============================================ */
+  .progression-section {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 6rem 1rem;
+    z-index: 1;
+  }
+
+  .progression-container {
+    width: 100%;
+  }
+
+  .progression-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .progression-card {
+    background: #ffffff;
+    padding: 3rem 2rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .progression-card:hover {
+    background: #f8f8f8;
+    transform: translateY(-2px);
+  }
+
+  .progression-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+  }
+
+  .progression-title {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .progression-description {
+    font-family: "Inter", sans-serif;
+    font-size: 1rem;
+    color: #666666;
+    line-height: 1.6;
+    flex-grow: 1;
+  }
+
+  .progression-btn {
+    align-self: center;
+    margin-top: auto;
+  }
+
+  .progression-divider {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .progression-card:last-child .progression-divider {
+    display: none;
+  }
+
+  /* ============================================
+   RESPONSIVE DESIGN PARA NUEVAS SECCIONES
+   ============================================ */
+  @media (max-width: 1024px) {
+    .trainers-grid,
+    .progression-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .progression-divider {
+      display: none;
+    }
+
+    .trainers-title,
+    .progression-title {
+      font-size: 42px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .trainers-section,
+    .progression-section {
+      padding: 4rem 1rem;
+    }
+
+    .trainers-title,
+    .progression-title {
+      font-size: 36px;
+    }
+
+    .trainer-card,
+    .progression-card {
+      padding: 2rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .trainers-title,
+    .progression-title {
+      font-size: 32px;
+    }
+
+    .trainer-card,
+    .progression-card {
+      padding: 1.5rem 1rem;
+    }
+
+    .trainer-name,
+    .progression-title {
+      font-size: 1.25rem;
+    }
+  }
+}

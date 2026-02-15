@@ -1,0 +1,803 @@
+/* ============================================
+   SUSCRIPCIONES STYLES - DISEÑO MEJORADO
+   ============================================ */
+
+/* Variables de color consistentes */
+:root {
+  --primary-red: #ef4444;
+  --primary-dark: #1a1a1a;
+  --primary-light: #ffffff;
+  --gray-light: #f8fafc;
+  --gray-medium: #e5e5e5;
+  --gray-dark: #666666;
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-red: rgba(239, 68, 68, 0.15);
+}
+
+/* ============================================
+   BREADCRUMBS CENTRADOS
+   ============================================ */
+.breadcrumbs {
+  position: relative;
+  padding: 1rem 1rem;
+  background: var(--primary-light);
+  border-bottom: 1px solid var(--gray-medium);
+  margin-top: 90px;
+}
+
+.breadcrumbs-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 0.5rem;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+  color: var(--gray-dark);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.breadcrumb-link:hover {
+  color: var(--primary-red);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.breadcrumb-link svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+}
+
+.breadcrumb-separator {
+  color: var(--gray-medium);
+  font-size: 0.875rem;
+}
+
+.breadcrumb-current {
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+  color: var(--primary-dark);
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* Hero de Suscripciones Compacto */
+.subs-hero-compact {
+  position: relative;
+  padding: 3rem 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #2d2d2d 100%);
+  border-bottom: 3px solid var(--primary-red);
+}
+
+.subs-hero-content-compact {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.subs-hero-text {
+  flex: 1;
+  text-align: left;
+}
+
+.subs-title-compact {
+  font-size: 48px;
+  margin-bottom: 0.75rem;
+  color: var(--primary-light);
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 2px;
+  line-height: 1.1;
+}
+
+.subs-subtitle-compact {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.highlight-red {
+  color: var(--primary-red);
+  font-weight: 700;
+}
+
+.subs-hero-cta {
+  flex-shrink: 0;
+}
+
+.subs-hero-btn {
+  padding: 1rem 2rem;
+  background: var(--primary-red);
+  color: var(--primary-light);
+  border-radius: 8px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.subs-hero-btn:hover {
+  background: transparent;
+  border-color: var(--primary-red);
+  transform: translateY(-2px);
+}
+
+.subs-hero-benefits {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary-light);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.benefit-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary-red);
+}
+
+/* Sección de Membresías */
+.subs-memberships-section {
+  padding: 4rem 1rem;
+  background: var(--gray-light);
+}
+
+.subs-memberships-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.subs-memberships-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .subs-memberships-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .subs-memberships-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+.subs-membership-card {
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px var(--shadow-light);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 550px;
+  border: 1px solid var(--gray-medium);
+  background: var(--primary-light);
+  text-align: center;
+}
+
+.subs-membership-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px var(--shadow-red);
+}
+
+.subs-membership-popular {
+  border-color: var(--primary-red);
+}
+
+.subs-popular-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--primary-red);
+  color: var(--primary-light);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.subs-membership-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.subs-membership-level {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  color: var(--primary-red);
+}
+
+.subs-membership-name {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 1px;
+  color: var(--primary-dark);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.subs-membership-description {
+  font-family: "Inter", sans-serif;
+  font-size: 0.95rem;
+  color: var(--gray-dark);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  min-height: 45px;
+}
+
+.subs-membership-price {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  min-height: 70px;
+}
+
+.subs-price-currency {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--primary-dark);
+}
+
+.subs-price-amount {
+  font-family: "Bebas Neue", cursive;
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--primary-dark);
+}
+
+.subs-price-duration {
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  color: var(--gray-dark);
+}
+
+/* CORRECCIÓN: QUITAR LAS LÍNEAS DE LAS CARACTERÍSTICAS */
+.subs-membership-features {
+  list-style: none;
+  margin-bottom: 2rem;
+  text-align: left;
+  flex: 1;
+  padding: 0;
+  min-height: 200px;
+}
+
+.subs-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  color: var(--primary-dark);
+  /* LÍNEA ELIMINADA */
+  border-bottom: none;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+
+/* Eliminar también el borde del último item */
+.subs-feature-item:last-child {
+  border-bottom: none;
+}
+
+.subs-feature-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--primary-red);
+  margin-top: 2px;
+}
+
+.subs-membership-btn {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid var(--primary-dark);
+  background: var(--primary-dark);
+  color: var(--primary-light);
+  text-decoration: none;
+  position: relative;
+}
+
+/* Estado hover (ratón encima) */
+.subs-membership-btn:hover {
+  background: transparent;
+  color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estado active (presionado) */
+.subs-membership-btn:active {
+  transform: translateY(0);
+  background: var(--primary-red);
+  border-color: var(--primary-red);
+  color: var(--primary-light);
+}
+
+/* Estado focus (enfoque con teclado) */
+.subs-membership-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+}
+
+.subs-btn-arrow {
+  width: 16px;
+  height: 16px;
+  transition: all 0.3s ease;
+}
+
+.subs-membership-btn:hover .subs-btn-arrow {
+  transform: translateX(4px);
+  color: var(--primary-dark);
+}
+
+.subs-membership-btn:active .subs-btn-arrow {
+  color: var(--primary-light);
+}
+
+/* Banner de Promoción */
+.promo-banner {
+  background: linear-gradient(135deg, var(--primary-dark), #2a2a2a);
+  padding: 2rem 1rem;
+  margin: 2rem 0;
+}
+
+.promo-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .promo-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.promo-text {
+  flex: 1;
+}
+
+.promo-title {
+  font-size: 2rem;
+  color: var(--primary-light);
+  margin-bottom: 0.5rem;
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 1px;
+}
+
+.text-red {
+  color: var(--primary-red);
+}
+
+.promo-subtitle {
+  font-family: "Inter", sans-serif;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+}
+
+.promo-cta {
+  flex-shrink: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .promo-cta {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+.promo-btn-primary,
+.promo-btn-secondary {
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid var(--primary-red);
+}
+
+.promo-btn-primary {
+  background: var(--primary-red);
+  color: var(--primary-light);
+}
+
+.promo-btn-primary:hover {
+  background: transparent;
+  color: var(--primary-red);
+  transform: translateY(-2px);
+}
+
+.promo-btn-secondary {
+  background: transparent;
+  color: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+.promo-btn-secondary:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.promo-btn-arrow {
+  width: 16px;
+  height: 16px;
+}
+
+/* Sección de Servicios */
+.subs-services-section {
+  padding: 4rem 1rem;
+  background: var(--primary-light);
+}
+
+.subs-services-grid {
+  max-width: 1280px;
+  margin: 2rem auto 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.subs-service-card {
+  background: var(--primary-light);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px var(--shadow-light);
+  transition: all 0.3s ease;
+  border: 1px solid var(--gray-medium);
+}
+
+.subs-service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px var(--shadow-red);
+  border-color: var(--primary-red);
+}
+
+.subs-service-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.subs-service-title {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: var(--primary-dark);
+}
+
+.subs-service-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 0.95rem;
+  color: var(--gray-dark);
+  line-height: 1.5;
+}
+
+/* FAQ Section */
+.faq-section {
+  padding: 4rem 1rem;
+  background: var(--gray-light);
+}
+
+.faq-container {
+  max-width: 800px;
+  margin: 2rem auto 0;
+}
+
+.faq-item {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--gray-medium);
+  background: var(--primary-light);
+}
+
+.faq-question {
+  width: 100%;
+  padding: 1.25rem;
+  text-align: left;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--primary-dark);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.faq-question:hover {
+  color: var(--primary-red);
+}
+
+.faq-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.faq-question.active .faq-icon {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  padding: 0 1.25rem 1.25rem;
+  font-family: "Inter", sans-serif;
+  font-size: 0.95rem;
+  color: var(--gray-dark);
+  line-height: 1.5;
+  display: none;
+}
+
+.faq-answer.active {
+  display: block;
+}
+
+/* Estilos comunes para secciones */
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 2px;
+  color: var(--primary-dark);
+  text-align: center;
+  width: 100%;
+}
+
+.section-subtitle {
+  font-family: "Inter", sans-serif;
+  color: var(--gray-dark);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+/* Estilos específicos para texto con fondo blanco */
+.subs-membership-card[style*="background: #ffffff"] .subs-membership-name,
+.subs-membership-card[style*="background: #ffffff"]
+  .subs-membership-description,
+.subs-membership-card[style*="background: #ffffff"] .subs-price-amount,
+.subs-membership-card[style*="background: #ffffff"] .subs-price-currency,
+.subs-membership-card[style*="background: #ffffff"] .subs-price-duration,
+.subs-membership-card[style*="background: #ffffff"] .subs-feature-item span {
+  color: var(--primary-dark) !important;
+}
+
+.subs-membership-card[style*="background: #ffffff"] .subs-feature-icon {
+  color: var(--primary-red) !important;
+}
+
+.subs-membership-card[style*="background: #ffffff"] .subs-membership-btn {
+  background: var(--primary-dark);
+  color: var(--primary-light);
+  border-color: var(--primary-dark);
+}
+
+.subs-membership-card[style*="background: #ffffff"] .subs-membership-btn:hover {
+  background: transparent;
+  color: var(--primary-dark);
+}
+
+/* Alineación vertical mejorada */
+.subs-memberships-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.subs-memberships-section {
+  padding: 4rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ANIMACIÓN DE CARGA PARA BOTONES */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.subs-membership-btn.loading {
+  animation: pulse 1.5s infinite;
+  cursor: wait;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .subs-hero-content-compact {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .subs-hero-text {
+    text-align: center;
+  }
+
+  .subs-title-compact {
+    font-size: 36px;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .subs-membership-card {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .subs-membership-name {
+    font-size: 1.5rem;
+  }
+
+  .subs-price-amount {
+    font-size: 2.5rem;
+  }
+
+  .subs-membership-features {
+    min-height: auto;
+  }
+
+  .section-title {
+    padding: 0 1rem;
+  }
+
+  .section-subtitle {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .subs-title-compact {
+    font-size: 28px;
+  }
+
+  .subs-hero-benefits {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .promo-title {
+    font-size: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* MEJORAS RESPONSIVE */
+@media (max-width: 1024px) {
+  .subs-membership-card {
+    min-height: 500px;
+  }
+
+  .subs-membership-name {
+    font-size: 1.5rem;
+    min-height: 50px;
+  }
+
+  .subs-price-amount {
+    font-size: 2.5rem;
+  }
+}
