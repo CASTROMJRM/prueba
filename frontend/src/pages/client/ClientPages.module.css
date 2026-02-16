@@ -1,0 +1,41 @@
+.page {
+  width: 100%;
+}
+
+.page h2 {
+  margin: 6px 0 12px;
+  font-size: 22px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.card {
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 16px;
+  background: #fff;
+}
+
+.card p {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 16px;
+  color: #111;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
