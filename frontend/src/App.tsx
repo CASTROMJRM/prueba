@@ -44,46 +44,51 @@ import ClientSubscriptionPage from "./pages/client/ClientSubscriptionPage";
 import ClientPaymentsPage from "./pages/client/ClientPaymentsPage";
 import Configuracion2FA from "./pages/Configuracion2FA";
 
+import ProtectedRoute from "./components/routing/ProtectedRoute";
+
 export default function App() {
   return (
-      <Routes>
-        {/* ✅ Público con header/footer */}
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/catalogue" element={<CatalogePage />} />
-          <Route path="/suscripciones" element={<SuscripcionesPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/AboutPage" element={<AboutPage />} />
-          <Route path="/AboutePage" element={<AboutePage />} />
+    <Routes>
+      {/* ✅ Público con header/footer */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/catalogue" element={<CatalogePage />} />
+        <Route path="/suscripciones" element={<SuscripcionesPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/AboutPage" element={<AboutPage />} />
+        <Route path="/AboutePage" element={<AboutePage />} />
 
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/confirmation" element={<ConfirmationPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/confirmation" element={<ConfirmationPage />} />
 
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-          <Route path="/500" element={<Error500Page />} />
-          <Route path="/400" element={<Error400Page />} />
-          <Route path="/oauth-callback" element={<OAuthCallbackPage />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
-          <Route path="/verify-account" element={<VerifyAccountPage />} />
+        <Route path="/500" element={<Error500Page />} />
+        <Route path="/400" element={<Error400Page />} />
+        <Route path="/oauth-callback" element={<OAuthCallbackPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/verify-account" element={<VerifyAccountPage />} />
 
-          <Route path="/confirmar-acceso" element={<ConfirmAccessPage />} />
-          <Route path="/login-totp" element={<LoginTOTP />} />
-          <Route path="/verificar-otp" element={<VerificarOTP />} />
-          <Route path="/esperando-confirmacion" element={<EsperandoConfirmacionPage />} />
+        <Route path="/confirmar-acceso" element={<ConfirmAccessPage />} />
+        <Route path="/login-totp" element={<LoginTOTP />} />
+        <Route path="/verificar-otp" element={<VerificarOTP />} />
+        <Route
+          path="/esperando-confirmacion"
+          element={<EsperandoConfirmacionPage />}
+        />
 
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify-reset" element={<VerifyResetCode />} />
-          <Route path="/new-password" element={<NewPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-reset" element={<VerifyResetCode />} />
+        <Route path="/new-password" element={<NewPassword />} />
 
-          <Route path="/terms" element={<TermsAndConditionsPage />} />
-          <Route path="/aviso-privacidad" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsAndConditionsPage />} />
+        <Route path="/aviso-privacidad" element={<PrivacyPolicyPage />} />
+      </Route>
 
-        </Route>
-
-        {/* ✅ Admin (sin navbar público) */}
+      {/* ✅ Admin protegido por rol */}
+      <Route element={<ProtectedRoute allowedRoles={["administrador"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="products" element={<AdminProductsPage />} />
@@ -91,10 +96,11 @@ export default function App() {
           <Route path="settings" element={<AdminSiteSettingsPage />} />
           <Route path="brands" element={<AdminBrandsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
-
         </Route>
+      </Route>
 
-        {/* ✅ Cliente (sin navbar público) */}
+      {/* ✅ Cliente protegido por rol */}
+      <Route element={<ProtectedRoute allowedRoles={["cliente"]} />}>
         <Route path="/cliente" element={<ClientPortalLayout />}>
           <Route index element={<ClientDashboardPage />} />
           <Route path="perfil" element={<ClientProfilePage />} />
@@ -102,9 +108,10 @@ export default function App() {
           <Route path="pagos" element={<ClientPaymentsPage />} />
           <Route path="configuracion" element={<Configuracion2FA />} />
         </Route>
+      </Route>
 
-        {/* ✅ Not found al final */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      {/* ✅ Not found al final */}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }

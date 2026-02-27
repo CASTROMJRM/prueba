@@ -62,7 +62,7 @@ export default function Header() {
         { to: "/", label: "INICIO", icon: FaHome, end: true },
         { to: "/catalogue", label: "PRODUCTOS", icon: FaDumbbell },
         { to: "/suscripciones", label: "SUSCRIPCIONES", icon: FaIdCard },
-        { to: "/AboutePage", label: "ACERCA DE", icon: FaInfoCircle },
+        { to: "/AboutePage", label: "ACERCA DE NOSOTROS", icon: FaInfoCircle },
       ];
     }
 

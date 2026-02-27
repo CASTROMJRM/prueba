@@ -81,7 +81,10 @@ export default function ProductModal({
   onReorderExistingImages,
 }: Props) {
   const activeBrands = useMemo(() => brands.filter((b) => b.active), [brands]);
-  const activeCategories = useMemo(() => categories.filter((c) => c.active), [categories]);
+  const activeCategories = useMemo(
+    () => categories.filter((c) => c.active),
+    [categories],
+  );
 
   const [data, setData] = useState<ProductFormData>(defaultData);
 
@@ -98,7 +101,8 @@ export default function ProductModal({
     const merged = { ...defaultData, ...initial } as ProductFormData;
 
     if (!merged.brandId && activeBrands[0]) merged.brandId = activeBrands[0].id;
-    if (!merged.categoryId && activeCategories[0]) merged.categoryId = activeCategories[0].id;
+    if (!merged.categoryId && activeCategories[0])
+      merged.categoryId = activeCategories[0].id;
 
     merged.description = merged.description ?? "";
     merged.features = merged.features ?? [];
@@ -108,7 +112,9 @@ export default function ProductModal({
     setFeatureInput("");
 
     // cargar galería existente ordenada
-    const sorted = [...existingImages].sort((a, b) => Number(a.order) - Number(b.order));
+    const sorted = [...existingImages].sort(
+      (a, b) => Number(a.order) - Number(b.order),
+    );
     setGallery(sorted);
   }, [open, initial, activeBrands, activeCategories, existingImages]);
 
@@ -128,7 +134,8 @@ export default function ProductModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.images]);
 
-  const noBrandOrCategory = activeBrands.length === 0 || activeCategories.length === 0;
+  const noBrandOrCategory =
+    activeBrands.length === 0 || activeCategories.length === 0;
 
   const canSave = useMemo(() => {
     const hasSupplementDetails =
@@ -136,7 +143,8 @@ export default function ProductModal({
       data.supplementFlavor?.trim() &&
       data.supplementServings?.trim();
 
-    const hasApparelDetails = data.apparelSize?.trim() && data.apparelColor?.trim();
+    const hasApparelDetails =
+      data.apparelSize?.trim() && data.apparelColor?.trim();
 
     return (
       data.name.trim().length >= 3 &&
@@ -168,7 +176,10 @@ export default function ProductModal({
   };
 
   const removeFeature = (idx: number) => {
-    setData((p) => ({ ...p, features: p.features.filter((_, i) => i !== idx) }));
+    setData((p) => ({
+      ...p,
+      features: p.features.filter((_, i) => i !== idx),
+    }));
   };
 
   const handleSave = () => {
@@ -233,7 +244,11 @@ export default function ProductModal({
                 : "Completa los datos del producto."}
             </p>
           </div>
-          <button className={styles.close} onClick={onClose} aria-label="Cerrar">
+          <button
+            className={styles.close}
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
             ✕
           </button>
         </div>
@@ -242,10 +257,14 @@ export default function ProductModal({
           {/* ✅ IMÁGENES EXISTENTES (solo edición) */}
           {isEditing && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 700, marginBottom: 8 }}>Imágenes actuales</div>
+              <div style={{ fontWeight: 700, marginBottom: 8 }}>
+                Imágenes actuales
+              </div>
 
               {gallery.length === 0 ? (
-                <div style={{ opacity: 0.8 }}>Este producto aún no tiene imágenes guardadas.</div>
+                <div style={{ opacity: 0.8 }}>
+                  Este producto aún no tiene imágenes guardadas.
+                </div>
               ) : (
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                   {gallery.map((img, idx) => (
@@ -262,10 +281,21 @@ export default function ProductModal({
                       <img
                         src={img.url}
                         alt={`Imagen ${idx + 1}`}
-                        style={{ width: "100%", height: 110, objectFit: "cover" }}
+                        style={{
+                          width: "100%",
+                          height: 110,
+                          objectFit: "cover",
+                        }}
                       />
 
-                      <div style={{ padding: 8, display: "flex", gap: 6, justifyContent: "space-between" }}>
+                      <div
+                        style={{
+                          padding: 8,
+                          display: "flex",
+                          gap: 6,
+                          justifyContent: "space-between",
+                        }}
+                      >
                         <button
                           type="button"
                           className={styles.btnGhost}
@@ -297,7 +327,13 @@ export default function ProductModal({
                       </div>
 
                       {idx === 0 && (
-                        <div style={{ padding: "0 8px 8px", fontSize: 12, opacity: 0.9 }}>
+                        <div
+                          style={{
+                            padding: "0 8px 8px",
+                            fontSize: 12,
+                            opacity: 0.9,
+                          }}
+                        >
                           ⭐ Portada
                         </div>
                       )}
@@ -317,13 +353,23 @@ export default function ProductModal({
                   setData((p) => ({
                     ...p,
                     productType: e.target.value as ProductType,
-                    supplementFlavor: e.target.value === "Suplementación" ? p.supplementFlavor : "",
+                    supplementFlavor:
+                      e.target.value === "Suplementación"
+                        ? p.supplementFlavor
+                        : "",
                     supplementPresentation:
-                      e.target.value === "Suplementación" ? p.supplementPresentation : "",
-                    supplementServings: e.target.value === "Suplementación" ? p.supplementServings : "",
+                      e.target.value === "Suplementación"
+                        ? p.supplementPresentation
+                        : "",
+                    supplementServings:
+                      e.target.value === "Suplementación"
+                        ? p.supplementServings
+                        : "",
                     apparelSize: e.target.value === "Ropa" ? p.apparelSize : "",
-                    apparelColor: e.target.value === "Ropa" ? p.apparelColor : "",
-                    apparelMaterial: e.target.value === "Ropa" ? p.apparelMaterial : "",
+                    apparelColor:
+                      e.target.value === "Ropa" ? p.apparelColor : "",
+                    apparelMaterial:
+                      e.target.value === "Ropa" ? p.apparelMaterial : "",
                   }))
                 }
               >
@@ -336,7 +382,9 @@ export default function ProductModal({
               <span>Nombre</span>
               <input
                 value={data.name}
-                onChange={(e) => setData((p) => ({ ...p, name: e.target.value }))}
+                onChange={(e) =>
+                  setData((p) => ({ ...p, name: e.target.value }))
+                }
                 placeholder="Ej. Creatina Monohidratada"
               />
             </label>
@@ -345,7 +393,9 @@ export default function ProductModal({
               <span>Marca</span>
               <select
                 value={data.brandId}
-                onChange={(e) => setData((p) => ({ ...p, brandId: e.target.value }))}
+                onChange={(e) =>
+                  setData((p) => ({ ...p, brandId: e.target.value }))
+                }
                 disabled={activeBrands.length === 0}
               >
                 {activeBrands.length === 0 ? (
@@ -364,7 +414,9 @@ export default function ProductModal({
               <span>Categoría</span>
               <select
                 value={data.categoryId}
-                onChange={(e) => setData((p) => ({ ...p, categoryId: e.target.value }))}
+                onChange={(e) =>
+                  setData((p) => ({ ...p, categoryId: e.target.value }))
+                }
                 disabled={activeCategories.length === 0}
               >
                 {activeCategories.length === 0 ? (
@@ -383,7 +435,9 @@ export default function ProductModal({
               <span>Descripción</span>
               <textarea
                 value={data.description}
-                onChange={(e) => setData((p) => ({ ...p, description: e.target.value }))}
+                onChange={(e) =>
+                  setData((p) => ({ ...p, description: e.target.value }))
+                }
                 rows={3}
                 placeholder="Descripción completa del producto…"
               />
@@ -392,23 +446,46 @@ export default function ProductModal({
             <div className={`${styles.field} ${styles.span2}`}>
               <span>Características</span>
 
-              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  marginTop: 6,
+                  flexWrap: "wrap",
+                }}
+              >
                 <input
+                  style={{ flex: "1 1 220px" }}
                   value={featureInput}
                   onChange={(e) => setFeatureInput(e.target.value)}
                   placeholder="Ej. 24g de proteína por servicio"
                 />
-                <button type="button" className={styles.btnGhost} onClick={addFeature}>
+                <button
+                  type="button"
+                  className={styles.btnGhost}
+                  onClick={addFeature}
+                >
                   + Agregar
                 </button>
               </div>
 
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  marginTop: 10,
+                }}
+              >
                 {data.features.map((f, idx) => (
                   <span
                     key={`${f}-${idx}`}
                     className={styles.tag}
-                    style={{ display: "inline-flex", gap: 8, alignItems: "center" }}
+                    style={{
+                      display: "inline-flex",
+                      gap: 8,
+                      alignItems: "center",
+                    }}
                   >
                     {f}
                     <button
@@ -430,7 +507,10 @@ export default function ProductModal({
                   <input
                     value={data.supplementPresentation || ""}
                     onChange={(e) =>
-                      setData((p) => ({ ...p, supplementPresentation: e.target.value }))
+                      setData((p) => ({
+                        ...p,
+                        supplementPresentation: e.target.value,
+                      }))
                     }
                     placeholder="Ej. 900 g / 1.8 kg"
                   />
@@ -440,7 +520,12 @@ export default function ProductModal({
                   <span>Sabor</span>
                   <input
                     value={data.supplementFlavor || ""}
-                    onChange={(e) => setData((p) => ({ ...p, supplementFlavor: e.target.value }))}
+                    onChange={(e) =>
+                      setData((p) => ({
+                        ...p,
+                        supplementFlavor: e.target.value,
+                      }))
+                    }
                     placeholder="Ej. Chocolate / Vainilla"
                   />
                 </label>
@@ -449,7 +534,12 @@ export default function ProductModal({
                   <span>Porciones</span>
                   <input
                     value={data.supplementServings || ""}
-                    onChange={(e) => setData((p) => ({ ...p, supplementServings: e.target.value }))}
+                    onChange={(e) =>
+                      setData((p) => ({
+                        ...p,
+                        supplementServings: e.target.value,
+                      }))
+                    }
                     placeholder="Ej. 30 servicios"
                   />
                 </label>
@@ -460,7 +550,9 @@ export default function ProductModal({
                   <span>Talla</span>
                   <input
                     value={data.apparelSize || ""}
-                    onChange={(e) => setData((p) => ({ ...p, apparelSize: e.target.value }))}
+                    onChange={(e) =>
+                      setData((p) => ({ ...p, apparelSize: e.target.value }))
+                    }
                     placeholder="Ej. CH / M / G"
                   />
                 </label>
@@ -469,7 +561,9 @@ export default function ProductModal({
                   <span>Color</span>
                   <input
                     value={data.apparelColor || ""}
-                    onChange={(e) => setData((p) => ({ ...p, apparelColor: e.target.value }))}
+                    onChange={(e) =>
+                      setData((p) => ({ ...p, apparelColor: e.target.value }))
+                    }
                     placeholder="Ej. Negro / Azul"
                   />
                 </label>
@@ -478,7 +572,12 @@ export default function ProductModal({
                   <span>Material</span>
                   <input
                     value={data.apparelMaterial || ""}
-                    onChange={(e) => setData((p) => ({ ...p, apparelMaterial: e.target.value }))}
+                    onChange={(e) =>
+                      setData((p) => ({
+                        ...p,
+                        apparelMaterial: e.target.value,
+                      }))
+                    }
                     placeholder="Ej. Algodón / Dry-fit"
                   />
                 </label>
@@ -492,7 +591,9 @@ export default function ProductModal({
                 min={0}
                 step="0.01"
                 value={data.price}
-                onChange={(e) => setData((p) => ({ ...p, price: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setData((p) => ({ ...p, price: Number(e.target.value) }))
+                }
               />
             </label>
 
@@ -503,7 +604,9 @@ export default function ProductModal({
                 min={0}
                 step="1"
                 value={data.stock}
-                onChange={(e) => setData((p) => ({ ...p, stock: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setData((p) => ({ ...p, stock: Number(e.target.value) }))
+                }
               />
             </label>
 
@@ -511,7 +614,12 @@ export default function ProductModal({
               <span>Estado</span>
               <select
                 value={data.status}
-                onChange={(e) => setData((p) => ({ ...p, status: e.target.value as ProductStatus }))}
+                onChange={(e) =>
+                  setData((p) => ({
+                    ...p,
+                    status: e.target.value as ProductStatus,
+                  }))
+                }
               >
                 <option value="Activo">Activo</option>
                 <option value="Inactivo">Inactivo</option>
@@ -531,19 +639,28 @@ export default function ProductModal({
                 }}
               />
               <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
-                * Estas se agregan al final. Para cambiar el orden, usa ⬆️⬇️ en “Imágenes actuales”.
+                * Estas se agregan al final. Para cambiar el orden, usa ⬆️⬇️ en
+                “Imágenes actuales”.
               </div>
             </label>
           </div>
 
           {!!previewUrls.length && (
-            <div className={styles.preview} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div
+              className={styles.preview}
+              style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
+            >
               {previewUrls.map((u, idx) => (
                 <img
                   key={u + idx}
                   src={u}
                   alt={`Vista ${idx + 1}`}
-                  style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 10 }}
+                  style={{
+                    width: 120,
+                    height: 120,
+                    objectFit: "cover",
+                    borderRadius: 10,
+                  }}
                 />
               ))}
             </div>
@@ -558,7 +675,11 @@ export default function ProductModal({
             className={styles.btnPrimary}
             onClick={handleSave}
             disabled={!canSave || noBrandOrCategory}
-            title={noBrandOrCategory ? "Necesitas marcas y categorías activas" : undefined}
+            title={
+              noBrandOrCategory
+                ? "Necesitas marcas y categorías activas"
+                : undefined
+            }
           >
             Guardar
           </button>
