@@ -48,31 +48,19 @@ https.createServer(httpsOptions, app).listen(PORT, () =>
 );
 
 */
-<<<<<<< HEAD
-
-=======
->>>>>>> 45ce176 (cambios 1 de marzo)
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 45ce176 (cambios 1 de marzo)
 import { secureHeaders } from "./middleware/secureHeaders.js";
 import { forceHTTPS } from "./middleware/forceHTTPS.js";
 import authRoutes from "./routes/authRoutes.js";
 import { sequelize } from "./config/sequelize.js";
 import userRoutes from "./routes/userRoutes.js";
-<<<<<<< HEAD
-=======
 import devRoutes from "./routes/devroutes.js";
 import brandRoutes from "./routes/admin/brandRoutes.js";
 import categoryRoutes from "./routes/admin/categoryRoutes.js";
 import productRoutes from "./routes/admin/productRoutes.js";
->>>>>>> 45ce176 (cambios 1 de marzo)
 
 dotenv.config();
 const app = express();
@@ -91,11 +79,6 @@ sequelize
   .then(() => console.log("✅ Tablas sincronizadas"))
   .catch((err) => console.error("❌ Error al conectar DB:", err));
 
-<<<<<<< HEAD
-
-app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes); // ahora tienes /api/user/perfil y /api/user/admin-dashboard
-=======
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes); // ahora tienes /api/user/perfil y /api/user/admin-dashboard
@@ -103,7 +86,6 @@ app.use("/api/dev", devRoutes);
 app.use("/api/admin/brands", brandRoutes);
 app.use("/api/admin/categories", categoryRoutes);
 app.use("/api/admin/products", productRoutes);
->>>>>>> 45ce176 (cambios 1 de marzo)
 
 
 const PORT = process.env.PORT || 5000;

@@ -3,10 +3,7 @@ import jwt from "jsonwebtoken";
 import { Session } from "../models/Session.js";
 import { User } from "../models/User.js";
 
-<<<<<<< HEAD
-=======
 // ✅ Verifica JWT + Session (para logout / blacklist / cosas de sesión)
->>>>>>> 45ce176 (cambios 1 de marzo)
 export const verifyToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -16,21 +13,10 @@ export const verifyToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-<<<<<<< HEAD
-    // 🔹 Guardamos el método de login de ESTA sesión
-    req.loginMethod = decoded.loginMethod || "local";
-
-    const session = await Session.findOne({
-      where: {
-        token,
-        revoked: false,
-      },
-=======
     req.loginMethod = decoded.loginMethod || "local";
 
     const session = await Session.findOne({
       where: { token, revoked: false },
->>>>>>> 45ce176 (cambios 1 de marzo)
     });
 
     if (!session) {
@@ -51,25 +37,6 @@ export const verifyToken = async (req, res, next) => {
     next();
   } catch (err) {
     console.error("❌ Error al verificar token:", err);
-<<<<<<< HEAD
-    res.status(403).json({ error: "Token inválido" });
-  }
-};
-
-// 🔸 NUEVO: middleware de autorización por rol
-export const authorizeRole = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res
-        .status(401)
-        .json({ error: "Usuario no autenticado" });
-    }
-
-    if (!roles.includes(req.user.role)) {
-      return res
-        .status(403)
-        .json({ error: "No tienes permisos para acceder a este recurso" });
-=======
     return res.status(403).json({ error: "Token inválido" });
   }
 };
@@ -101,14 +68,11 @@ export const authorizeRole = (...roles) => {
 
     if (!roles.includes(role)) {
       return res.status(403).json({ error: "No tienes permisos para acceder a este recurso" });
->>>>>>> 45ce176 (cambios 1 de marzo)
     }
 
     next();
   };
 };
-<<<<<<< HEAD
-=======
 
 // ✅ Admin fijo
 export const requireAdmin = (req, res, next) => {
@@ -118,4 +82,4 @@ export const requireAdmin = (req, res, next) => {
   }
   next();
 };
->>>>>>> 45ce176 (cambios 1 de marzo)
+
