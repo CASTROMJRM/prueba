@@ -236,7 +236,7 @@ export default function LoginPage() {
                 <div className="auth-input-group">
                   <label className="auth-label">Contraseña</label>
                   <div className="auth-input-wrap">
-                    <span className="auth-input-icon" aria-hidden="true">
+                      <span className="auth-input-icon" aria-hidden="true">
                       <FiLock className="auth-icon" />
                     </span>
                     <input
@@ -250,14 +250,10 @@ export default function LoginPage() {
                     <button
                       type="button"
                       className="auth-eye-btn"
-                      aria-label={
-                        showPassword
-                          ? "Ocultar contraseña"
-                          : "Mostrar contraseña"
-                      }
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       onClick={() => setShowPassword((v) => !v)}
                     >
-                      {showPassword ? (
+                       {showPassword ? (
                         <FiEyeOff className="auth-icon" aria-hidden="true" />
                       ) : (
                         <FiEye className="auth-icon" aria-hidden="true" />
