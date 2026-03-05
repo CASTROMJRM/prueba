@@ -53,6 +53,7 @@ export const Product = sequelize.define(
   },
   {
     tableName: "Products",
+    schema: "core",
     timestamps: true,
   }
 );

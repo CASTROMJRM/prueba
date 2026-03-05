@@ -15,24 +15,37 @@ const parseJsonArray = (raw) => {
 };
 
 export const listProducts = async (req, res) => {
-  const products = await Product.findAll({
-    include: [
-      // ahora queremos exponer id_marca e id_categoria
-      { model: Brand, attributes: ["id_marca", "name"] },
-      { model: Category, attributes: ["id_categoria", "name"] },
-      { model: ProductImage, as: "images", attributes: ["id", "url", "order"] },
-    ],
-    order: [["createdAt", "DESC"]],
-  });
+  try {
+    const products = await Product.findAll({
+      include: [
+        { model: Brand, attributes: ["id_marca", "name"] },
+        { model: Category, attributes: ["id_categoria", "name"] },
+        {
+          model: ProductImage,
+          as: "images",
+          attributes: ["id", "url", "order"],
+          where: { active: true },
+          required: false,
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
 
-  const out = products.map((p) => {
-    const json = p.toJSON();
-    const imgs = Array.isArray(json.images) ? json.images : [];
-    imgs.sort((a, b) => Number(a.order) - Number(b.order));
-    return { ...json, images: imgs };
-  });
+    const out = products.map((p) => {
+      const json = p.toJSON();
+      const imgs = Array.isArray(json.images) ? json.images : [];
+      imgs.sort((a, b) => Number(a.order) - Number(b.order));
+      return { ...json, images: imgs };
+    });
 
-  return res.json(out);
+    return res.json(out);
+  } catch (err) {
+    console.error("listProducts error:", err);
+    return res.status(500).json({
+      error: "Error listando productos",
+      details: err.message,
+    });
+  }
 };
 
 export const createProduct = async (req, res) => {
@@ -44,8 +57,8 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ error: "Validación", details: errors });
     }
 
-    const brandId = Number(req.body.brandId);       // -> id_marca
-    const categoryId = Number(req.body.categoryId); // -> id_categoria
+    const brandId = Number(req.body.brandId);
+    const categoryId = Number(req.body.categoryId);
 
     const brand = await Brand.findOne({
       where: { id_marca: brandId },
@@ -79,20 +92,22 @@ export const createProduct = async (req, res) => {
       for (const f of files) {
         if (!f?.buffer) continue;
         const uploaded = await uploadBufferToCloudinary(f.buffer);
-        uploadedImages.push({ url: uploaded.secure_url, publicId: uploaded.public_id });
+        uploadedImages.push({
+          url: uploaded.secure_url,
+          publicId: uploaded.public_id,
+        });
       }
       if (uploadedImages[0]) imageUrl = uploadedImages[0].url;
     }
 
-    // ✅ autogenerar id_producto
     const id_producto = await getNextId(Product, "id_producto", t);
 
     const created = await Product.create(
       {
         id_producto,
         name: String(req.body.name).trim(),
-        brandId,      // fk a id_marca
-        categoryId,   // fk a id_categoria
+        brandId,
+        categoryId,
         price: Number(req.body.price ?? 0),
         stock: Number(req.body.stock ?? 0),
         status: req.body.status || "Activo",
@@ -112,7 +127,6 @@ export const createProduct = async (req, res) => {
       { transaction: t }
     );
 
-    // ✅ galería: productId debe ser id_producto (NO el pk técnico)
     if (uploadedImages.length) {
       await ProductImage.bulkCreate(
         uploadedImages.map((img, idx) => ({
@@ -120,6 +134,7 @@ export const createProduct = async (req, res) => {
           url: img.url,
           publicId: img.publicId,
           order: idx,
+          active: true,
         })),
         { transaction: t }
       );
@@ -127,11 +142,18 @@ export const createProduct = async (req, res) => {
 
     await t.commit();
 
-    // 🔎 traer completo por id_producto
     const full = await Product.findOne({
       where: { id_producto: created.id_producto },
       include: [
-        { model: ProductImage, as: "images", attributes: ["id", "url", "order"], separate: true, order: [["order", "ASC"]] },
+        {
+          model: ProductImage,
+          as: "images",
+          attributes: ["id", "url", "order"],
+          where: { active: true },
+          required: false,
+          separate: true,
+          order: [["order", "ASC"]],
+        },
       ],
     });
 
@@ -144,7 +166,10 @@ export const createProduct = async (req, res) => {
   } catch (err) {
     await t.rollback();
     console.error("createProduct error:", err);
-    return res.status(500).json({ error: "Error creando producto", details: err.message });
+    return res.status(500).json({
+      error: "Error creando producto",
+      details: err.message,
+    });
   }
 };
 
@@ -192,15 +217,15 @@ export const updateProduct = async (req, res) => {
     if (req.body.description != null) {
       req.body.description = String(req.body.description).trim() || null;
     }
+
     if (req.body.features != null) {
       req.body.features = JSON.stringify(parseJsonArray(req.body.features));
     }
 
-    // imágenes nuevas
     const files = Array.isArray(req.files) ? req.files : [];
     if (files.length) {
       const count = await ProductImage.count({
-        where: { productId: id_producto },
+        where: { productId: id_producto, active: true },
         transaction: t,
       });
 
@@ -208,7 +233,10 @@ export const updateProduct = async (req, res) => {
       for (const f of files) {
         if (!f?.buffer) continue;
         const uploaded = await uploadBufferToCloudinary(f.buffer);
-        uploadedImages.push({ url: uploaded.secure_url, publicId: uploaded.public_id });
+        uploadedImages.push({
+          url: uploaded.secure_url,
+          publicId: uploaded.public_id,
+        });
       }
 
       if (uploadedImages.length) {
@@ -218,6 +246,7 @@ export const updateProduct = async (req, res) => {
             url: img.url,
             publicId: img.publicId,
             order: count + idx,
+            active: true,
           })),
           { transaction: t }
         );
@@ -231,7 +260,17 @@ export const updateProduct = async (req, res) => {
 
     const full = await Product.findOne({
       where: { id_producto },
-      include: [{ model: ProductImage, as: "images", attributes: ["id", "url", "order"], separate: true, order: [["order", "ASC"]] }],
+      include: [
+        {
+          model: ProductImage,
+          as: "images",
+          attributes: ["id", "url", "order"],
+          where: { active: true },
+          required: false,
+          separate: true,
+          order: [["order", "ASC"]],
+        },
+      ],
     });
 
     const json = full.toJSON();
@@ -243,7 +282,10 @@ export const updateProduct = async (req, res) => {
   } catch (err) {
     await t.rollback();
     console.error("updateProduct error:", err);
-    return res.status(500).json({ error: "Error actualizando producto", details: err.message });
+    return res.status(500).json({
+      error: "Error actualizando producto",
+      details: err.message,
+    });
   }
 };
 
@@ -268,7 +310,10 @@ export const deleteProduct = async (req, res) => {
   } catch (err) {
     await t.rollback();
     console.error("deleteProduct error:", err);
-    return res.status(500).json({ error: "Error desactivando producto", details: err.message });
+    return res.status(500).json({
+      error: "Error desactivando producto",
+      details: err.message,
+    });
   }
 };
 
@@ -289,7 +334,7 @@ export const deleteProductImage = async (req, res) => {
     }
 
     const img = await ProductImage.findOne({
-      where: { id: imageId, productId: id_producto },
+      where: { id: imageId, productId: id_producto, active: true },
       transaction: t,
       lock: t.LOCK.UPDATE,
     });
@@ -298,11 +343,10 @@ export const deleteProductImage = async (req, res) => {
       return res.status(404).json({ error: "Imagen no encontrada" });
     }
 
-    await img.destroy({ transaction: t });
+    await img.update({ active: false }, { transaction: t });
 
-    // Re-ordenar
     const rest = await ProductImage.findAll({
-      where: { productId: id_producto },
+      where: { productId: id_producto, active: true },
       order: [["order", "ASC"]],
       transaction: t,
       lock: t.LOCK.UPDATE,
@@ -316,11 +360,14 @@ export const deleteProductImage = async (req, res) => {
     }
 
     await t.commit();
-    return res.json({ ok: true });
+    return res.json({ ok: true, message: "Imagen desactivada correctamente" });
   } catch (err) {
     await t.rollback();
     console.error("deleteProductImage error:", err);
-    return res.status(500).json({ error: "Error eliminando imagen", details: err.message });
+    return res.status(500).json({
+      error: "Error desactivando imagen",
+      details: err.message,
+    });
   }
 };
 
@@ -346,7 +393,7 @@ export const reorderProductImages = async (req, res) => {
     }
 
     const imgs = await ProductImage.findAll({
-      where: { productId: id_producto },
+      where: { productId: id_producto, active: true },
       transaction: t,
     });
 
@@ -362,14 +409,21 @@ export const reorderProductImages = async (req, res) => {
     for (let i = 0; i < orderArr.length; i++) {
       await ProductImage.update(
         { order: i },
-        { where: { id: Number(orderArr[i]), productId: id_producto }, transaction: t }
+        {
+          where: {
+            id: Number(orderArr[i]),
+            productId: id_producto,
+            active: true,
+          },
+          transaction: t,
+        }
       );
     }
 
     await t.commit();
 
     const updated = await ProductImage.findAll({
-      where: { productId: id_producto },
+      where: { productId: id_producto, active: true },
       order: [["order", "ASC"]],
     });
 
@@ -377,6 +431,9 @@ export const reorderProductImages = async (req, res) => {
   } catch (err) {
     await t.rollback();
     console.error("reorderProductImages error:", err);
-    return res.status(500).json({ error: "Error reordenando imágenes", details: err.message });
+    return res.status(500).json({
+      error: "Error reordenando imágenes",
+      details: err.message,
+    });
   }
 };

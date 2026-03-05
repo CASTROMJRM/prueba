@@ -31,6 +31,7 @@ export const Category = sequelize.define(
   },
   {
     tableName: "Categories",
+    schema: "core",
     timestamps: true,
   }
 );

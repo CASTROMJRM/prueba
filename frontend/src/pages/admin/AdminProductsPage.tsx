@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
 import styles from "./AdminProductsPage.module.css";
-
+import ProductImportExportPanel from "../../components/layout/admin/ProductImportExportPanel/ProductImportExportPanel";
 import ProductModal, {
   type ProductFormData,
   type ExistingImage,
@@ -34,6 +34,9 @@ export default function AdminProductsPage() {
   const [editing, setEditing] = useState<ProductDTO | null>(null);
 
   const [loading, setLoading] = useState(true);
+
+  // ✅ Mostrar/ocultar panel Import/Export
+  const [showImportExport, setShowImportExport] = useState(false);
 
   // ✅ Normaliza active (boolean | 0/1 | "0"/"1" | "true"/"false")
   const isActive = (v: any) => v === true || v === 1 || v === "1" || v === "true";
@@ -214,36 +217,54 @@ export default function AdminProductsPage() {
           </p>
         </div>
 
-        {/* ✅ Botón clickeable siempre + alerta si no puede abrir */}
-        <button
-          className={styles.primaryBtn}
-          type="button"
-          onClick={() => {
-            if (loading) {
-              alert("Aún se está cargando la información. Espera un momento y vuelve a intentar.");
-              return;
-            }
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {/* ✅ Botón Import/Export */}
+          <button
+            className={styles.btnGhost}
+            type="button"
+            onClick={() => setShowImportExport((v) => !v)}
+          >
+            {showImportExport ? "Ocultar Import/Export" : "Importar / Exportar CSV"}
+          </button>
 
-            if (!canCreateProduct) {
-              const reasons: string[] = [];
-              if (activeBrands.length === 0) reasons.push("No hay MARCAS activas.");
-              if (activeCategories.length === 0) reasons.push("No hay CATEGORÍAS activas.");
+          {/* ✅ Botón clickeable siempre + alerta si no puede abrir */}
+          <button
+            className={styles.primaryBtn}
+            type="button"
+            onClick={() => {
+              if (loading) {
+                alert("Aún se está cargando la información. Espera un momento y vuelve a intentar.");
+                return;
+              }
 
-              alert(
-                `No se puede abrir el modal para crear producto:\n\n` +
-                  reasons.join("\n") +
-                  `\n\nMarcas activas: ${activeBrands.length}\nCategorías activas: ${activeCategories.length}\n\n` +
-                  `Solución: crea o activa al menos 1 marca y 1 categoría.`
-              );
-              return;
-            }
+              if (!canCreateProduct) {
+                const reasons: string[] = [];
+                if (activeBrands.length === 0) reasons.push("No hay MARCAS activas.");
+                if (activeCategories.length === 0) reasons.push("No hay CATEGORÍAS activas.");
 
-            openCreate();
-          }}
-        >
-          + Nuevo producto
-        </button>
+                alert(
+                  `No se puede abrir el modal para crear producto:\n\n` +
+                    reasons.join("\n") +
+                    `\n\nMarcas activas: ${activeBrands.length}\nCategorías activas: ${activeCategories.length}\n\n` +
+                    `Solución: crea o activa al menos 1 marca y 1 categoría.`
+                );
+                return;
+              }
+
+              openCreate();
+            }}
+          >
+            + Nuevo producto
+          </button>
+        </div>
       </div>
+
+      {/* ✅ Panel Import/Export (colapsable) */}
+      {showImportExport && (
+        <div className={styles.card} style={{ marginBottom: 14 }}>
+          <ProductImportExportPanel />
+        </div>
+      )}
 
       <div className={styles.card}>
         <div className={styles.toolbar}>
@@ -367,17 +388,14 @@ export default function AdminProductsPage() {
       <ProductModal
         open={openModal}
         title={editing ? "Editar producto" : "Nuevo producto"}
-        brands={activeBrands}      
+        brands={activeBrands}
         categories={activeCategories as any}
-
-        // ✅ CLAVE PARA PODER BORRAR/ORDENAR
         productId={editing?.id}
         existingImages={existingImages}
         onDeleteExistingImage={async (imageId) => {
           if (!editing) return;
           await deleteProductImage(editing.id, imageId);
 
-          // actualiza producto actual en state (y también editing)
           setProducts((prev) =>
             prev.map((p) =>
               p.id === editing.id
@@ -400,7 +418,6 @@ export default function AdminProductsPage() {
 
           setEditing((prev) => (prev ? { ...prev, images: updated as any } : prev));
         }}
-
         initial={
           editing
             ? {
@@ -412,7 +429,7 @@ export default function AdminProductsPage() {
                 status: editing.status,
                 productType: editing.productType,
 
-                images: [], // ✅ archivos nuevos van aquí
+                images: [],
 
                 description: String((editing as any).description ?? ""),
                 features: normalizeFeatures((editing as any).features),

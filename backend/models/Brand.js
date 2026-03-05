@@ -16,7 +16,6 @@ export const Brand = sequelize.define(
       allowNull: false,
       unique: true,
     },
-
     name: {
       type: DataTypes.STRING(120),
       allowNull: false,
@@ -36,6 +35,7 @@ export const Brand = sequelize.define(
   },
   {
     tableName: "Brands",
+    schema: "core",
     timestamps: true,
   }
 );

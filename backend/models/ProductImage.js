@@ -31,9 +31,15 @@ export const ProductImage = sequelize.define(
       type: DataTypes.STRING(500),
       allowNull: true,
     },
+  active: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  },
   },
   {
     tableName: "product_images",
+    schema: "core",
     timestamps: true,
   }
 );

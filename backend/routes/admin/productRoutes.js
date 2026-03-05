@@ -9,19 +9,38 @@ import {
   deleteProduct,
   deleteProductImage,
   reorderProductImages,
-} from "../../controllers/productController.js"; // ✅ ESTA RUTA
+} from "../../controllers/productController.js";
+
+import {
+  exportProductsCsv,
+  uploadProductsCsv,
+  validateProductsImport,
+  getImportErrors,
+  commitProductsImport,
+} from "../../controllers/catalogImportExportController.js";
 
 const router = Router();
 
 router.use(requireAuth, requireAdmin);
 
+/* =========================
+   CRUD normal
+========================= */
 router.get("/", listProducts);
-
 router.post("/", upload.array("images", 8), createProduct);
 router.put("/:id", upload.array("images", 8), updateProduct);
-
 router.delete("/:id", deleteProduct);
 router.delete("/:id/images/:imageId", deleteProductImage);
 router.put("/:id/images/reorder", reorderProductImages);
+
+/* =========================
+   EXPORT / IMPORT CSV
+========================= */
+router.get("/export/csv", exportProductsCsv);
+
+router.post("/import/upload", upload.single("file"), uploadProductsCsv);
+router.post("/import/:batchId/validate", validateProductsImport);
+router.get("/import/:batchId/errors", getImportErrors);
+router.post("/import/:batchId/commit", commitProductsImport);
 
 export default router;
