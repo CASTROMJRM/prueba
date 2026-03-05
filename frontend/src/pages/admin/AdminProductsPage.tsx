@@ -19,7 +19,10 @@ import {
 
 import { toProductFormData } from "../../services/admin/toProductFormData";
 import { getBrands, type BrandDTO } from "../../services/admin/brandService";
-import { getCategories, type CategoryDTO } from "../../services/admin/categoryService";
+import {
+  getCategories,
+  type CategoryDTO,
+} from "../../services/admin/categoryService";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<ProductDTO[]>([]);
@@ -39,7 +42,8 @@ export default function AdminProductsPage() {
   const [showImportExport, setShowImportExport] = useState(false);
 
   // ✅ Normaliza active (boolean | 0/1 | "0"/"1" | "true"/"false")
-  const isActive = (v: any) => v === true || v === 1 || v === "1" || v === "true";
+  const isActive = (v: any) =>
+    v === true || v === 1 || v === "1" || v === "true";
 
   const refreshAll = async () => {
     setLoading(true);
@@ -69,19 +73,23 @@ export default function AdminProductsPage() {
 
   const activeBrands = useMemo(
     () => brands.filter((b) => isActive((b as any).active)),
-    [brands]
+    [brands],
   );
   const activeCategories = useMemo(
     () => categories.filter((c) => isActive((c as any).active)),
-    [categories]
+    [categories],
   );
 
-  const canCreateProduct = activeBrands.length > 0 && activeCategories.length > 0;
+  const canCreateProduct =
+    activeBrands.length > 0 && activeCategories.length > 0;
 
-  const brandMap = useMemo(() => new Map(brands.map((b) => [b.id, b.name])), [brands]);
+  const brandMap = useMemo(
+    () => new Map(brands.map((b) => [b.id, b.name])),
+    [brands],
+  );
   const categoryMap = useMemo(
     () => new Map(categories.map((c) => [c.id, c.name])),
-    [categories]
+    [categories],
   );
 
   const categoryOptions = useMemo(() => {
@@ -137,8 +145,14 @@ export default function AdminProductsPage() {
       await deleteProduct(id);
       setProducts((prev) => prev.filter((p) => p.id !== id));
     } catch (err: any) {
-      console.error("DELETE PRODUCT ERROR:", err?.response?.status, err?.response?.data);
-      alert(`${err?.response?.status} - ${err?.response?.data?.error || "Error"}`);
+      console.error(
+        "DELETE PRODUCT ERROR:",
+        err?.response?.status,
+        err?.response?.data,
+      );
+      alert(
+        `${err?.response?.status} - ${err?.response?.data?.error || "Error"}`,
+      );
     }
   };
 
@@ -158,24 +172,42 @@ export default function AdminProductsPage() {
       // ✅ nuevos campos
       fd.append("description", String((p as any).description ?? ""));
       const f = (p as any).features;
-      fd.append("features", typeof f === "string" ? f : JSON.stringify(f ?? []));
+      fd.append(
+        "features",
+        typeof f === "string" ? f : JSON.stringify(f ?? []),
+      );
 
       // opcionales
       if (p.productType === "Suplementación") {
-        if ((p as any).supplementFlavor) fd.append("supplementFlavor", (p as any).supplementFlavor);
-        if ((p as any).supplementPresentation) fd.append("supplementPresentation", (p as any).supplementPresentation);
-        if ((p as any).supplementServings) fd.append("supplementServings", (p as any).supplementServings);
+        if ((p as any).supplementFlavor)
+          fd.append("supplementFlavor", (p as any).supplementFlavor);
+        if ((p as any).supplementPresentation)
+          fd.append(
+            "supplementPresentation",
+            (p as any).supplementPresentation,
+          );
+        if ((p as any).supplementServings)
+          fd.append("supplementServings", (p as any).supplementServings);
       } else {
-        if ((p as any).apparelSize) fd.append("apparelSize", (p as any).apparelSize);
-        if ((p as any).apparelColor) fd.append("apparelColor", (p as any).apparelColor);
-        if ((p as any).apparelMaterial) fd.append("apparelMaterial", (p as any).apparelMaterial);
+        if ((p as any).apparelSize)
+          fd.append("apparelSize", (p as any).apparelSize);
+        if ((p as any).apparelColor)
+          fd.append("apparelColor", (p as any).apparelColor);
+        if ((p as any).apparelMaterial)
+          fd.append("apparelMaterial", (p as any).apparelMaterial);
       }
 
       const updated = await updateProduct(p.id, fd);
       setProducts((prev) => prev.map((x) => (x.id === p.id ? updated : x)));
     } catch (err: any) {
-      console.error("TOGGLE PRODUCT ERROR:", err?.response?.status, err?.response?.data);
-      alert(`${err?.response?.status} - ${err?.response?.data?.error || "Error"}`);
+      console.error(
+        "TOGGLE PRODUCT ERROR:",
+        err?.response?.status,
+        err?.response?.data,
+      );
+      alert(
+        `${err?.response?.status} - ${err?.response?.data?.error || "Error"}`,
+      );
     }
   };
 
@@ -185,7 +217,9 @@ export default function AdminProductsPage() {
     if (typeof raw === "string") {
       try {
         const arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr.filter((x) => typeof x === "string") : [];
+        return Array.isArray(arr)
+          ? arr.filter((x) => typeof x === "string")
+          : [];
       } catch {
         return [];
       }
@@ -220,11 +254,13 @@ export default function AdminProductsPage() {
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {/* ✅ Botón Import/Export */}
           <button
-            className={styles.btnGhost}
+            className={styles.headerGhostBtn}
             type="button"
             onClick={() => setShowImportExport((v) => !v)}
           >
-            {showImportExport ? "Ocultar Import/Export" : "Importar / Exportar CSV"}
+            {showImportExport
+              ? "Ocultar Import/Export"
+              : "Importar / Exportar CSV"}
           </button>
 
           {/* ✅ Botón clickeable siempre + alerta si no puede abrir */}
@@ -233,20 +269,24 @@ export default function AdminProductsPage() {
             type="button"
             onClick={() => {
               if (loading) {
-                alert("Aún se está cargando la información. Espera un momento y vuelve a intentar.");
+                alert(
+                  "Aún se está cargando la información. Espera un momento y vuelve a intentar.",
+                );
                 return;
               }
 
               if (!canCreateProduct) {
                 const reasons: string[] = [];
-                if (activeBrands.length === 0) reasons.push("No hay MARCAS activas.");
-                if (activeCategories.length === 0) reasons.push("No hay CATEGORÍAS activas.");
+                if (activeBrands.length === 0)
+                  reasons.push("No hay MARCAS activas.");
+                if (activeCategories.length === 0)
+                  reasons.push("No hay CATEGORÍAS activas.");
 
                 alert(
                   `No se puede abrir el modal para crear producto:\n\n` +
                     reasons.join("\n") +
                     `\n\nMarcas activas: ${activeBrands.length}\nCategorías activas: ${activeCategories.length}\n\n` +
-                    `Solución: crea o activa al menos 1 marca y 1 categoría.`
+                    `Solución: crea o activa al menos 1 marca y 1 categoría.`,
                 );
                 return;
               }
@@ -254,7 +294,7 @@ export default function AdminProductsPage() {
               openCreate();
             }}
           >
-            + Nuevo producto
+            Nuevo producto 
           </button>
         </div>
       </div>
@@ -290,7 +330,9 @@ export default function AdminProductsPage() {
           <select
             className={styles.select}
             value={sort}
-            onChange={(e) => setSort(e.target.value as "name" | "price" | "stock")}
+            onChange={(e) =>
+              setSort(e.target.value as "name" | "price" | "stock")
+            }
           >
             <option value="name">Ordenar: Nombre</option>
             <option value="price">Ordenar: Precio</option>
@@ -315,7 +357,9 @@ export default function AdminProductsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className={styles.empty}>Cargando…</td>
+                  <td colSpan={7} className={styles.empty}>
+                    Cargando…
+                  </td>
                 </tr>
               ) : (
                 <>
@@ -325,7 +369,11 @@ export default function AdminProductsPage() {
                         <div className={styles.productCell}>
                           <img
                             className={styles.productImg}
-                            src={(p as any).imageUrl || (p as any)?.images?.[0]?.url || "https://via.placeholder.com/52"}
+                            src={
+                              (p as any).imageUrl ||
+                              (p as any)?.images?.[0]?.url ||
+                              "https://via.placeholder.com/52"
+                            }
                             alt={p.name}
                           />
                           <div>
@@ -335,31 +383,56 @@ export default function AdminProductsPage() {
                         </div>
                       </td>
 
-                      <td><span className={styles.tag}>{brandMap.get(p.brandId) ?? "—"}</span></td>
-                      <td><span className={styles.tag}>{categoryMap.get(p.categoryId) ?? "—"}</span></td>
+                      <td>
+                        <span className={styles.tag}>
+                          {brandMap.get(p.brandId) ?? "—"}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={styles.tag}>
+                          {categoryMap.get(p.categoryId) ?? "—"}
+                        </span>
+                      </td>
 
-                      <td className={styles.tdRight}>${Number(p.price).toFixed(2)} MXN</td>
                       <td className={styles.tdRight}>
-                        {Number(p.stock) > 0 ? p.stock : <span className={styles.out}>Sin stock</span>}
+                        ${Number(p.price).toFixed(2)} MXN
+                      </td>
+                      <td className={styles.tdRight}>
+                        {Number(p.stock) > 0 ? (
+                          p.stock
+                        ) : (
+                          <span className={styles.out}>Sin stock</span>
+                        )}
                       </td>
 
                       <td>
-                        <span className={`${styles.status} ${p.status === "Activo" ? styles.statusOn : styles.statusOff}`}>
+                        <span
+                          className={`${styles.status} ${p.status === "Activo" ? styles.statusOn : styles.statusOff}`}
+                        >
                           {p.status}
                         </span>
                       </td>
 
                       <td className={styles.tdRight}>
                         <div className={styles.actions}>
-                          <button className={styles.btnGhost} onClick={() => openEdit(p)}>
+                          <button
+                            className={styles.btnGhost}
+                            onClick={() => openEdit(p)}
+                          >
                             Editar
                           </button>
 
-                          <button className={styles.btnGhost} onClick={() => onToggleStatus(p)}>
+                          <button
+                            className={styles.btnGhost}
+                            onClick={() => onToggleStatus(p)}
+                          >
                             {p.status === "Activo" ? "Desactivar" : "Activar"}
                           </button>
 
-                          <button className={styles.btnDanger} onClick={() => onDelete(p.id)}>
+                          <button
+                            className={styles.btnDanger}
+                            onClick={() => onDelete(p.id)}
+                          >
                             Eliminar
                           </button>
                         </div>
@@ -369,7 +442,9 @@ export default function AdminProductsPage() {
 
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={7} className={styles.empty}>No hay productos con esos filtros.</td>
+                      <td colSpan={7} className={styles.empty}>
+                        No hay productos con esos filtros.
+                      </td>
                     </tr>
                   )}
                 </>
@@ -399,13 +474,25 @@ export default function AdminProductsPage() {
           setProducts((prev) =>
             prev.map((p) =>
               p.id === editing.id
-                ? { ...p, images: (p.images ?? []).filter((img: any) => img.id !== imageId) }
-                : p
-            )
+                ? {
+                    ...p,
+                    images: (p.images ?? []).filter(
+                      (img: any) => img.id !== imageId,
+                    ),
+                  }
+                : p,
+            ),
           );
 
           setEditing((prev) =>
-            prev ? { ...prev, images: (prev.images ?? []).filter((img: any) => img.id !== imageId) } : prev
+            prev
+              ? {
+                  ...prev,
+                  images: (prev.images ?? []).filter(
+                    (img: any) => img.id !== imageId,
+                  ),
+                }
+              : prev,
           );
         }}
         onReorderExistingImages={async (newOrderIds) => {
@@ -413,10 +500,14 @@ export default function AdminProductsPage() {
           const updated = await reorderProductImages(editing.id, newOrderIds);
 
           setProducts((prev) =>
-            prev.map((p) => (p.id === editing.id ? { ...p, images: updated as any } : p))
+            prev.map((p) =>
+              p.id === editing.id ? { ...p, images: updated as any } : p,
+            ),
           );
 
-          setEditing((prev) => (prev ? { ...prev, images: updated as any } : prev));
+          setEditing((prev) =>
+            prev ? { ...prev, images: updated as any } : prev,
+          );
         }}
         initial={
           editing
@@ -435,7 +526,8 @@ export default function AdminProductsPage() {
                 features: normalizeFeatures((editing as any).features),
 
                 supplementFlavor: (editing as any).supplementFlavor ?? "",
-                supplementPresentation: (editing as any).supplementPresentation ?? "",
+                supplementPresentation:
+                  (editing as any).supplementPresentation ?? "",
                 supplementServings: (editing as any).supplementServings ?? "",
 
                 apparelSize: (editing as any).apparelSize ?? "",
@@ -454,7 +546,9 @@ export default function AdminProductsPage() {
 
             if (editing) {
               const updated = await updateProduct(editing.id, form);
-              setProducts((prev) => prev.map((x) => (x.id === editing.id ? updated : x)));
+              setProducts((prev) =>
+                prev.map((x) => (x.id === editing.id ? updated : x)),
+              );
               setEditing(updated);
             } else {
               const created = await createProduct(form);
@@ -464,8 +558,14 @@ export default function AdminProductsPage() {
             setOpenModal(false);
             setEditing(null);
           } catch (err: any) {
-            console.error("SAVE PRODUCT ERROR:", err?.response?.status, err?.response?.data);
-            alert(`${err?.response?.status} - ${err?.response?.data?.error || "Error"}`);
+            console.error(
+              "SAVE PRODUCT ERROR:",
+              err?.response?.status,
+              err?.response?.data,
+            );
+            alert(
+              `${err?.response?.status} - ${err?.response?.data?.error || "Error"}`,
+            );
           }
         }}
       />

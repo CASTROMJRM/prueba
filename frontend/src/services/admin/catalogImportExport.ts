@@ -20,6 +20,13 @@ export const uploadProductsCsv = async (file: File) => {
   return response.data;
 };
 
+export const exportProductsImportTemplateCsv = async () => {
+  const response = await API.get("/admin/products/import/template/csv", {
+    responseType: "blob",
+  });
+  return response.data;
+};
+
 export const validateProductsImport = async (batchId: string) => {
   const response = await API.post(`/admin/products/import/${batchId}/validate`);
   return response.data;

@@ -11,9 +11,9 @@ function make(url) {
   });
 }
 
-// ✅ la app normal seguirá usando "sequelize"
+//la app normal seguirá usando "sequelize"
 export const sequelize = make(process.env.DATABASE_URL_RUNTIME);
 
-// ✅ nuevas conexiones por rol
+
 export const sequelizeImporter = make(process.env.DATABASE_URL_IMPORTER);
 export const sequelizeReports = make(process.env.DATABASE_URL_REPORTS);

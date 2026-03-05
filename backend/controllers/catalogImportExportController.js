@@ -74,7 +74,7 @@ export const exportProductsCsv = async (req, res) => {
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="catalogo_productos.csv"`
+      `attachment; filename="catalogo_productos.csv"`,
     );
 
     return res.status(200).send(csv);
@@ -87,6 +87,69 @@ export const exportProductsCsv = async (req, res) => {
   }
 };
 
+/* =========================================================
+   EXPORTAR PLANTILLA DE IMPORTACIÓN (CAMPOS CLAVE)
+========================================================= */
+export const exportProductsImportTemplateCsv = async (req, res) => {
+  try {
+    const [rows] = await sequelizeReports.query(`
+      SELECT
+        p.name,
+        p."brandId",
+        b.name AS "brandName",
+        p."categoryId",
+        c.name AS "categoryName",
+        p.price,
+        p.stock,
+        p.status,
+        p."productType",
+        p.description,
+        p.features
+      FROM core."Products" p
+      LEFT JOIN core."Brands" b
+        ON p."brandId" = b.id_marca
+      LEFT JOIN core."Categories" c
+        ON p."categoryId" = c.id_categoria
+      ORDER BY p.name ASC;
+    `);
+
+    const normalized = rows.map((row) => ({
+      ...row,
+      features: row.features ?? "[]",
+    }));
+
+    const fields = [
+      "name",
+      "brandId",
+      "brandName",
+      "categoryId",
+      "categoryName",
+      "price",
+      "stock",
+      "status",
+      "productType",
+      "description",
+      "features",
+    ];
+
+    const parser = new Parser({ fields });
+    const csv = parser.parse(normalized);
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="plantilla_importacion_productos.csv"`,
+    );
+
+    return res.status(200).send(csv);
+  } catch (error) {
+    console.error("exportProductsImportTemplateCsv error:", error);
+    return res.status(500).json({
+      error: "Error exportando plantilla de importación",
+      details: error.message,
+    });
+  }
+};
 /* =========================================================
    SUBIR CSV A STAGING
 ========================================================= */
@@ -112,7 +175,7 @@ export const uploadProductsCsv = async (req, res) => {
     // limpiar errores previos del lote por seguridad
     await sequelizeImporter.query(
       `DELETE FROM staging.import_errors WHERE batch_id = :batchId`,
-      { replacements: { batchId } }
+      { replacements: { batchId } },
     );
 
     const rows = records.map((row, index) => ({
@@ -132,13 +195,9 @@ export const uploadProductsCsv = async (req, res) => {
           ? Number(row.categoryId)
           : null,
       price:
-        row.price !== undefined && row.price !== ""
-          ? Number(row.price)
-          : null,
+        row.price !== undefined && row.price !== "" ? Number(row.price) : null,
       stock:
-        row.stock !== undefined && row.stock !== ""
-          ? Number(row.stock)
-          : null,
+        row.stock !== undefined && row.stock !== "" ? Number(row.stock) : null,
       status: row.status || null,
       productType: row.productType || null,
       imageUrl: row.imageUrl || null,
@@ -204,7 +263,7 @@ export const uploadProductsCsv = async (req, res) => {
           {
             transaction,
             replacements: row,
-          }
+          },
         );
       }
 
@@ -237,7 +296,7 @@ export const validateProductsImport = async (req, res) => {
 
     await sequelizeImporter.query(
       `DELETE FROM staging.import_errors WHERE batch_id = :batchId`,
-      { replacements: { batchId } }
+      { replacements: { batchId } },
     );
 
     // 1) NULOS OBLIGATORIOS
@@ -438,7 +497,7 @@ export const commitProductsImport = async (req, res) => {
       {
         replacements: { batchId },
         transaction,
-      }
+      },
     );
 
     if (errorsSummary.total_errors > 0) {
@@ -517,7 +576,7 @@ export const commitProductsImport = async (req, res) => {
       {
         replacements: { batchId },
         transaction,
-      }
+      },
     );
 
     await transaction.commit();

@@ -13,6 +13,7 @@ import {
 
 import {
   exportProductsCsv,
+  exportProductsImportTemplateCsv,
   uploadProductsCsv,
   validateProductsImport,
   getImportErrors,
@@ -37,6 +38,7 @@ router.put("/:id/images/reorder", reorderProductImages);
    EXPORT / IMPORT CSV
 ========================= */
 router.get("/export/csv", exportProductsCsv);
+router.get("/import/template/csv", exportProductsImportTemplateCsv);
 
 router.post("/import/upload", upload.single("file"), uploadProductsCsv);
 router.post("/import/:batchId/validate", validateProductsImport);

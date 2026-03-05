@@ -4,17 +4,21 @@
   background: rgba(0, 0, 0, 0.45);
   display: grid;
   place-items: center;
+  overflow: auto;
   z-index: 9999;
-  padding: 16px;
+  padding: 12px;
 }
 
 .modal {
   width: min(740px, 100%);
+  max-height: calc(100dvh - 24px);
   background: white;
   border-radius: 18px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -48,6 +52,9 @@
 
 .body {
   padding: 16px;
+  padding: 12px;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .grid {
@@ -134,6 +141,26 @@
 }
 
 @media (max-width: 640px) {
+  .backdrop {
+    padding: 8px;
+  }
+
+  .modal {
+    max-height: calc(100dvh - 16px);
+    border-radius: 14px;
+  }
+
+  .header {
+    padding: 12px 12px 8px;
+  }
+
+  .body {
+    padding: 12px;
+  }
+
+  .footer {
+    padding: 10px 12px;
+  }
   .grid {
     grid-template-columns: 1fr;
   }
