@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios"; // ✅ para axios.isAxiosError
-import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
+import axios from "axios";     // ✅ para axios.isAxiosError
 import { API } from "../api/api"; // ✅ tu instancia
 
 import { useAuth } from "../context/AuthContext";
@@ -217,28 +216,19 @@ export default function LoginPage() {
                 {/* Email */}
                 <div className="auth-input-group">
                   <label className="auth-label">Correo</label>
-                  <div className="auth-input-wrap">
-                    <span className="auth-input-icon" aria-hidden="true">
-                      <FiMail className="auth-icon" />
-                    </span>
-                    <input
-                      type="email"
-                      className="auth-input"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Ingresa tu correo"
-                      required
-                    />
-                  </div>
+                  <input
+                    type="email"
+                    className="auth-input"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
 
                 {/* Password */}
                 <div className="auth-input-group">
                   <label className="auth-label">Contraseña</label>
                   <div className="auth-input-wrap">
-                      <span className="auth-input-icon" aria-hidden="true">
-                      <FiLock className="auth-icon" />
-                    </span>
                     <input
                       type={showPassword ? "text" : "password"}
                       className="auth-input"
@@ -249,15 +239,9 @@ export default function LoginPage() {
                     />
                     <button
                       type="button"
-                      className="auth-eye-btn"
-                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       onClick={() => setShowPassword((v) => !v)}
                     >
-                       {showPassword ? (
-                        <FiEyeOff className="auth-icon" aria-hidden="true" />
-                      ) : (
-                        <FiEye className="auth-icon" aria-hidden="true" />
-                      )}
+                      {showPassword ? "🙈" : "👁️"}
                     </button>
                   </div>
                 </div>
@@ -270,8 +254,8 @@ export default function LoginPage() {
                   {loading
                     ? "Iniciando..."
                     : isLocked
-                      ? "Bloqueado"
-                      : "Iniciar Sesión"}
+                    ? "Bloqueado"
+                    : "Iniciar Sesión"}
                 </button>
 
                 {/* Google */}

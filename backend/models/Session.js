@@ -38,6 +38,7 @@ export const Session = sequelize.define(
   },
   {
     tableName: "sessions",
+    schema: "core",
     timestamps: true,
   }
 );

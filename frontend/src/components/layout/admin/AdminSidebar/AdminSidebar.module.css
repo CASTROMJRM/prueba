@@ -16,79 +16,42 @@
   font-size: 28px;
 }
 
-.brandSub {
-  opacity: 0.75;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.brandText {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end; /* 👈 aquí se alinea PANEL con ADMIN */
-  line-height: 1.05;
-}
-
 .nav {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.groupTitle {
-  width: 100%;
-  border: 0;
+.link,
+.catalogToggle,
+.subLink {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 12px;
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.72);
-  background: rgba(255, 255, 255, 0.04);
-  cursor: pointer;
-  text-align: left;
-}
-
-.groupTitle:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-}
-
-.groupActive {
-  color: #fff;
-  border: 1px solid rgba(239, 68, 68, 0.25);
-}
-
-.groupItems {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.chevron {
-  margin-left: auto;
-  display: inline-flex;
-}
-
-.link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 12px;
+  padding: 12px;
   border-radius: 12px;
   color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   transition: 0.2s ease;
 }
 
-.link:hover {
+.catalogToggle {
+  width: 100%;
+  border: 1px solid rgba(239, 68, 68, 0.24);
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+.catalogLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.link:hover,
+.catalogToggle:hover,
+.subLink:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
 }
@@ -97,6 +60,36 @@
   background: rgba(239, 68, 68, 0.18);
   border: 1px solid rgba(239, 68, 68, 0.25);
   color: #fff;
+}
+
+submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0 4px;
+  padding-left: 10px;
+}
+
+.subLink {
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.subActive {
+  background: rgba(239, 68, 68, 0.16);
+  border: 1px solid rgba(239, 68, 68, 0.24);
+  color: #fff;
+}
+
+.chevron {
+  display: inline-flex;
+  transition: transform 0.2s ease;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
 }
 
 .icon {
@@ -110,17 +103,11 @@
   font-size: 14px;
 }
 
-
-.childLink {
-  margin-left: 14px;
-}
-
-
 /* New styles for brand link and logo */
 .brandLink {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-start; /* 👈 en vez de center */
+  justify-content: flex-start;
   text-decoration: none;
 }
 

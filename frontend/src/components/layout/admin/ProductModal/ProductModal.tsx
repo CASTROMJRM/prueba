@@ -1,18 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./ProductModal.module.css";
 
-export type BrandLike = { id: string; name: string; active: boolean };
-export type CategoryLike = { id: string; name: string; active: boolean };
+type IdLike = string | number;
+
+// ✅ soporta ids numéricos o string
+export type BrandLike = { id: IdLike; name: string; active: boolean; categoryId: IdLike };
+export type CategoryLike = { id: IdLike; name: string; active: boolean };
 
 export type ProductStatus = "Activo" | "Inactivo";
 export type ProductType = "Suplementación" | "Ropa";
 
-export type ExistingImage = { id: string; url: string; order: number };
+export type ExistingImage = { id: IdLike; url: string; order: number };
 
 export type ProductFormData = {
   name: string;
-  brandId: string;
-  categoryId: string;
+  brandId: string;     // estado siempre string
+  categoryId: string;  // estado siempre string
 
   price: number;
   stock: number;
@@ -22,7 +25,6 @@ export type ProductFormData = {
   description: string;
   features: string[];
 
-  // ✅ archivos nuevos (se suben al guardar)
   images: File[];
 
   supplementFlavor?: string;
@@ -44,11 +46,9 @@ interface Props {
   brands: BrandLike[];
   categories: CategoryLike[];
 
-  // ✅ SOLO si estás editando
-  productId?: string;
+  productId?: IdLike;
   existingImages?: ExistingImage[];
 
-  // ✅ acciones para imágenes existentes (backend)
   onDeleteExistingImage?: (imageId: string) => Promise<void>;
   onReorderExistingImages?: (newOrderIds: string[]) => Promise<void>;
 }
@@ -66,6 +66,9 @@ const defaultData: ProductFormData = {
   images: [],
 };
 
+const asStr = (v: unknown) => (v == null ? "" : String(v));
+const trimStr = (v: unknown) => asStr(v).trim();
+
 export default function ProductModal({
   open,
   title = "Nuevo producto",
@@ -80,29 +83,47 @@ export default function ProductModal({
   onDeleteExistingImage,
   onReorderExistingImages,
 }: Props) {
-  const activeBrands = useMemo(() => brands.filter((b) => b.active), [brands]);
-  const activeCategories = useMemo(
-    () => categories.filter((c) => c.active),
-    [categories],
-  );
+  const activeCategories = useMemo(() => categories.filter((c) => c.active), [categories]);
+  const activeBrandsAll = useMemo(() => brands.filter((b) => b.active), [brands]);
 
   const [data, setData] = useState<ProductFormData>(defaultData);
 
-  // ✅ previews de archivos nuevos
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [featureInput, setFeatureInput] = useState("");
 
-  // ✅ estado local para la galería existente (para reordenar UI)
   const [gallery, setGallery] = useState<ExistingImage[]>([]);
+
+  // ✅ marcas filtradas por la categoría seleccionada
+  const brandsByCategory = useMemo(() => {
+    const catId = trimStr(data.categoryId);
+    if (!catId) return activeBrandsAll;
+    return activeBrandsAll.filter((b) => trimStr(b.categoryId) === catId);
+  }, [activeBrandsAll, data.categoryId]);
 
   useEffect(() => {
     if (!open) return;
 
     const merged = { ...defaultData, ...initial } as ProductFormData;
 
-    if (!merged.brandId && activeBrands[0]) merged.brandId = activeBrands[0].id;
-    if (!merged.categoryId && activeCategories[0])
-      merged.categoryId = activeCategories[0].id;
+    // ✅ normalizar ids a string (backend puede mandar number)
+    merged.brandId = merged.brandId != null ? String(merged.brandId) : "";
+    merged.categoryId = merged.categoryId != null ? String(merged.categoryId) : "";
+
+    // ✅ default category
+    if (!merged.categoryId && activeCategories[0]) merged.categoryId = String(activeCategories[0].id);
+
+    // ✅ default brand según category
+    const validBrands = activeBrandsAll.filter(
+      (b) => trimStr(b.categoryId) === trimStr(merged.categoryId)
+    );
+
+    if (!merged.brandId) {
+      merged.brandId = validBrands[0]?.id != null ? String(validBrands[0].id) : "";
+    } else {
+      // si viene brandId pero no pertenece a la categoría, ajustamos
+      const stillValid = validBrands.some((b) => String(b.id) === String(merged.brandId));
+      if (!stillValid) merged.brandId = validBrands[0]?.id != null ? String(validBrands[0].id) : "";
+    }
 
     merged.description = merged.description ?? "";
     merged.features = merged.features ?? [];
@@ -111,15 +132,11 @@ export default function ProductModal({
     setData(merged);
     setFeatureInput("");
 
-    // cargar galería existente ordenada
-    const sorted = [...existingImages].sort(
-      (a, b) => Number(a.order) - Number(b.order),
-    );
+    const sorted = [...existingImages].sort((a, b) => Number(a.order) - Number(b.order));
     setGallery(sorted);
-  }, [open, initial, activeBrands, activeCategories, existingImages]);
+  }, [open, initial, activeBrandsAll, activeCategories, existingImages]);
 
   useEffect(() => {
-    // cleanup old previews
     previewUrls.forEach((u) => URL.revokeObjectURL(u));
 
     if (!data.images?.length) {
@@ -134,22 +151,23 @@ export default function ProductModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.images]);
 
-  const noBrandOrCategory =
-    activeBrands.length === 0 || activeCategories.length === 0;
+  const noBrandOrCategory = activeBrandsAll.length === 0 || activeCategories.length === 0;
 
   const canSave = useMemo(() => {
     const hasSupplementDetails =
-      data.supplementPresentation?.trim() &&
-      data.supplementFlavor?.trim() &&
-      data.supplementServings?.trim();
+      trimStr(data.supplementPresentation) &&
+      trimStr(data.supplementFlavor) &&
+      trimStr(data.supplementServings);
 
-    const hasApparelDetails =
-      data.apparelSize?.trim() && data.apparelColor?.trim();
+    const hasApparelDetails = trimStr(data.apparelSize) && trimStr(data.apparelColor);
+
+    const brandOk = trimStr(data.brandId).length > 0;
+    const catOk = trimStr(data.categoryId).length > 0;
 
     return (
-      data.name.trim().length >= 3 &&
-      data.brandId.trim().length > 0 &&
-      data.categoryId.trim().length > 0 &&
+      trimStr(data.name).length >= 3 &&
+      brandOk &&
+      catOk &&
       Number.isFinite(data.price) &&
       data.price > 0 &&
       Number.isFinite(data.stock) &&
@@ -176,10 +194,7 @@ export default function ProductModal({
   };
 
   const removeFeature = (idx: number) => {
-    setData((p) => ({
-      ...p,
-      features: p.features.filter((_, i) => i !== idx),
-    }));
+    setData((p) => ({ ...p, features: p.features.filter((_, i) => i !== idx) }));
   };
 
   const handleSave = () => {
@@ -187,31 +202,28 @@ export default function ProductModal({
 
     onSave({
       ...data,
-      name: data.name.trim(),
-      description: data.description.trim(),
-      features: (data.features ?? []).map((x) => x.trim()).filter(Boolean),
+      name: trimStr(data.name),
+      description: trimStr(data.description),
+      features: (data.features ?? []).map((x) => trimStr(x)).filter(Boolean),
+      brandId: trimStr(data.brandId),
+      categoryId: trimStr(data.categoryId),
     });
   };
 
-  // ✅ borrar imagen existente
-  const handleDeleteExisting = async (imageId: string) => {
+  const handleDeleteExisting = async (imageId: IdLike) => {
     if (!productId) return;
     if (!onDeleteExistingImage) return;
 
     const ok = confirm("¿Quitar esta imagen del producto?");
     if (!ok) return;
 
-    await onDeleteExistingImage(imageId);
-
-    // actualiza UI local
-    setGallery((prev) => prev.filter((x) => x.id !== imageId));
+    await onDeleteExistingImage(String(imageId));
+    setGallery((prev) => prev.filter((x) => String(x.id) !== String(imageId)));
   };
 
-  // ✅ reordenar (mover arriba/abajo)
   const moveExisting = async (from: number, to: number) => {
     if (!productId) return;
     if (!onReorderExistingImages) return;
-
     if (to < 0 || to >= gallery.length) return;
 
     const copy = [...gallery];
@@ -220,8 +232,7 @@ export default function ProductModal({
 
     setGallery(copy);
 
-    // manda nuevo orden al backend por ids
-    const ids = copy.map((x) => x.id);
+    const ids = copy.map((x) => String(x.id));
     await onReorderExistingImages(ids);
   };
 
@@ -244,32 +255,23 @@ export default function ProductModal({
                 : "Completa los datos del producto."}
             </p>
           </div>
-          <button
-            className={styles.close}
-            onClick={onClose}
-            aria-label="Cerrar"
-          >
+          <button className={styles.close} onClick={onClose} aria-label="Cerrar">
             ✕
           </button>
         </div>
 
         <div className={styles.body}>
-          {/* ✅ IMÁGENES EXISTENTES (solo edición) */}
           {isEditing && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 700, marginBottom: 8 }}>
-                Imágenes actuales
-              </div>
+              <div style={{ fontWeight: 700, marginBottom: 8 }}>Imágenes actuales</div>
 
               {gallery.length === 0 ? (
-                <div style={{ opacity: 0.8 }}>
-                  Este producto aún no tiene imágenes guardadas.
-                </div>
+                <div style={{ opacity: 0.8 }}>Este producto aún no tiene imágenes guardadas.</div>
               ) : (
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                   {gallery.map((img, idx) => (
                     <div
-                      key={img.id}
+                      key={String(img.id)}
                       style={{
                         width: 140,
                         borderRadius: 12,
@@ -281,11 +283,7 @@ export default function ProductModal({
                       <img
                         src={img.url}
                         alt={`Imagen ${idx + 1}`}
-                        style={{
-                          width: "100%",
-                          height: 110,
-                          objectFit: "cover",
-                        }}
+                        style={{ width: "100%", height: 110, objectFit: "cover" }}
                       />
 
                       <div
@@ -327,13 +325,7 @@ export default function ProductModal({
                       </div>
 
                       {idx === 0 && (
-                        <div
-                          style={{
-                            padding: "0 8px 8px",
-                            fontSize: 12,
-                            opacity: 0.9,
-                          }}
-                        >
+                        <div style={{ padding: "0 8px 8px", fontSize: 12, opacity: 0.9 }}>
                           ⭐ Portada
                         </div>
                       )}
@@ -353,23 +345,14 @@ export default function ProductModal({
                   setData((p) => ({
                     ...p,
                     productType: e.target.value as ProductType,
-                    supplementFlavor:
-                      e.target.value === "Suplementación"
-                        ? p.supplementFlavor
-                        : "",
+                    supplementFlavor: e.target.value === "Suplementación" ? p.supplementFlavor : "",
                     supplementPresentation:
-                      e.target.value === "Suplementación"
-                        ? p.supplementPresentation
-                        : "",
+                      e.target.value === "Suplementación" ? p.supplementPresentation : "",
                     supplementServings:
-                      e.target.value === "Suplementación"
-                        ? p.supplementServings
-                        : "",
+                      e.target.value === "Suplementación" ? p.supplementServings : "",
                     apparelSize: e.target.value === "Ropa" ? p.apparelSize : "",
-                    apparelColor:
-                      e.target.value === "Ropa" ? p.apparelColor : "",
-                    apparelMaterial:
-                      e.target.value === "Ropa" ? p.apparelMaterial : "",
+                    apparelColor: e.target.value === "Ropa" ? p.apparelColor : "",
+                    apparelMaterial: e.target.value === "Ropa" ? p.apparelMaterial : "",
                   }))
                 }
               >
@@ -382,49 +365,59 @@ export default function ProductModal({
               <span>Nombre</span>
               <input
                 value={data.name}
-                onChange={(e) =>
-                  setData((p) => ({ ...p, name: e.target.value }))
-                }
+                onChange={(e) => setData((p) => ({ ...p, name: e.target.value }))}
                 placeholder="Ej. Creatina Monohidratada"
               />
             </label>
 
-            <label className={styles.field}>
-              <span>Marca</span>
-              <select
-                value={data.brandId}
-                onChange={(e) =>
-                  setData((p) => ({ ...p, brandId: e.target.value }))
-                }
-                disabled={activeBrands.length === 0}
-              >
-                {activeBrands.length === 0 ? (
-                  <option value="">(No hay marcas activas)</option>
-                ) : (
-                  activeBrands.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))
-                )}
-              </select>
-            </label>
-
+            {/* ✅ Categoría (primero) */}
             <label className={styles.field}>
               <span>Categoría</span>
               <select
                 value={data.categoryId}
-                onChange={(e) =>
-                  setData((p) => ({ ...p, categoryId: e.target.value }))
-                }
+                onChange={(e) => {
+                  const newCategoryId = e.target.value;
+
+                  setData((p) => {
+                    const validBrands = activeBrandsAll.filter(
+                      (b) => trimStr(b.categoryId) === trimStr(newCategoryId)
+                    );
+
+                    return {
+                      ...p,
+                      categoryId: newCategoryId,
+                      brandId: validBrands[0]?.id != null ? String(validBrands[0].id) : "",
+                    };
+                  });
+                }}
                 disabled={activeCategories.length === 0}
               >
                 {activeCategories.length === 0 ? (
                   <option value="">(No hay categorías activas)</option>
                 ) : (
                   activeCategories.map((c) => (
-                    <option key={c.id} value={c.id}>
+                    <option key={String(c.id)} value={String(c.id)}>
                       {c.name}
+                    </option>
+                  ))
+                )}
+              </select>
+            </label>
+
+            {/* ✅ Marca (filtrada por categoría) */}
+            <label className={styles.field}>
+              <span>Marca</span>
+              <select
+                value={data.brandId}
+                onChange={(e) => setData((p) => ({ ...p, brandId: e.target.value }))}
+                disabled={brandsByCategory.length === 0}
+              >
+                {brandsByCategory.length === 0 ? (
+                  <option value="">(No hay marcas para esta categoría)</option>
+                ) : (
+                  brandsByCategory.map((b) => (
+                    <option key={String(b.id)} value={String(b.id)}>
+                      {b.name}
                     </option>
                   ))
                 )}
@@ -435,9 +428,7 @@ export default function ProductModal({
               <span>Descripción</span>
               <textarea
                 value={data.description}
-                onChange={(e) =>
-                  setData((p) => ({ ...p, description: e.target.value }))
-                }
+                onChange={(e) => setData((p) => ({ ...p, description: e.target.value }))}
                 rows={3}
                 placeholder="Descripción completa del producto…"
               />
@@ -446,46 +437,23 @@ export default function ProductModal({
             <div className={`${styles.field} ${styles.span2}`}>
               <span>Características</span>
 
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  marginTop: 6,
-                  flexWrap: "wrap",
-                }}
-              >
+              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
                 <input
-                  style={{ flex: "1 1 220px" }}
                   value={featureInput}
                   onChange={(e) => setFeatureInput(e.target.value)}
                   placeholder="Ej. 24g de proteína por servicio"
                 />
-                <button
-                  type="button"
-                  className={styles.btnGhost}
-                  onClick={addFeature}
-                >
+                <button type="button" className={styles.btnGhost} onClick={addFeature}>
                   + Agregar
                 </button>
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 8,
-                  marginTop: 10,
-                }}
-              >
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
                 {data.features.map((f, idx) => (
                   <span
                     key={`${f}-${idx}`}
                     className={styles.tag}
-                    style={{
-                      display: "inline-flex",
-                      gap: 8,
-                      alignItems: "center",
-                    }}
+                    style={{ display: "inline-flex", gap: 8, alignItems: "center" }}
                   >
                     {f}
                     <button
@@ -507,10 +475,7 @@ export default function ProductModal({
                   <input
                     value={data.supplementPresentation || ""}
                     onChange={(e) =>
-                      setData((p) => ({
-                        ...p,
-                        supplementPresentation: e.target.value,
-                      }))
+                      setData((p) => ({ ...p, supplementPresentation: e.target.value }))
                     }
                     placeholder="Ej. 900 g / 1.8 kg"
                   />
@@ -520,12 +485,7 @@ export default function ProductModal({
                   <span>Sabor</span>
                   <input
                     value={data.supplementFlavor || ""}
-                    onChange={(e) =>
-                      setData((p) => ({
-                        ...p,
-                        supplementFlavor: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => setData((p) => ({ ...p, supplementFlavor: e.target.value }))}
                     placeholder="Ej. Chocolate / Vainilla"
                   />
                 </label>
@@ -535,10 +495,7 @@ export default function ProductModal({
                   <input
                     value={data.supplementServings || ""}
                     onChange={(e) =>
-                      setData((p) => ({
-                        ...p,
-                        supplementServings: e.target.value,
-                      }))
+                      setData((p) => ({ ...p, supplementServings: e.target.value }))
                     }
                     placeholder="Ej. 30 servicios"
                   />
@@ -550,9 +507,7 @@ export default function ProductModal({
                   <span>Talla</span>
                   <input
                     value={data.apparelSize || ""}
-                    onChange={(e) =>
-                      setData((p) => ({ ...p, apparelSize: e.target.value }))
-                    }
+                    onChange={(e) => setData((p) => ({ ...p, apparelSize: e.target.value }))}
                     placeholder="Ej. CH / M / G"
                   />
                 </label>
@@ -561,9 +516,7 @@ export default function ProductModal({
                   <span>Color</span>
                   <input
                     value={data.apparelColor || ""}
-                    onChange={(e) =>
-                      setData((p) => ({ ...p, apparelColor: e.target.value }))
-                    }
+                    onChange={(e) => setData((p) => ({ ...p, apparelColor: e.target.value }))}
                     placeholder="Ej. Negro / Azul"
                   />
                 </label>
@@ -572,12 +525,7 @@ export default function ProductModal({
                   <span>Material</span>
                   <input
                     value={data.apparelMaterial || ""}
-                    onChange={(e) =>
-                      setData((p) => ({
-                        ...p,
-                        apparelMaterial: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => setData((p) => ({ ...p, apparelMaterial: e.target.value }))}
                     placeholder="Ej. Algodón / Dry-fit"
                   />
                 </label>
@@ -591,9 +539,7 @@ export default function ProductModal({
                 min={0}
                 step="0.01"
                 value={data.price}
-                onChange={(e) =>
-                  setData((p) => ({ ...p, price: Number(e.target.value) }))
-                }
+                onChange={(e) => setData((p) => ({ ...p, price: Number(e.target.value) }))}
               />
             </label>
 
@@ -604,9 +550,7 @@ export default function ProductModal({
                 min={0}
                 step="1"
                 value={data.stock}
-                onChange={(e) =>
-                  setData((p) => ({ ...p, stock: Number(e.target.value) }))
-                }
+                onChange={(e) => setData((p) => ({ ...p, stock: Number(e.target.value) }))}
               />
             </label>
 
@@ -614,19 +558,13 @@ export default function ProductModal({
               <span>Estado</span>
               <select
                 value={data.status}
-                onChange={(e) =>
-                  setData((p) => ({
-                    ...p,
-                    status: e.target.value as ProductStatus,
-                  }))
-                }
+                onChange={(e) => setData((p) => ({ ...p, status: e.target.value as ProductStatus }))}
               >
                 <option value="Activo">Activo</option>
                 <option value="Inactivo">Inactivo</option>
               </select>
             </label>
 
-            {/* ✅ archivos nuevos */}
             <label className={`${styles.field} ${styles.span2}`}>
               <span>Agregar nuevas imágenes (puedes seleccionar varias)</span>
               <input
@@ -639,28 +577,19 @@ export default function ProductModal({
                 }}
               />
               <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
-                * Estas se agregan al final. Para cambiar el orden, usa ⬆️⬇️ en
-                “Imágenes actuales”.
+                * Estas se agregan al final. Para cambiar el orden, usa ⬆️⬇️ en “Imágenes actuales”.
               </div>
             </label>
           </div>
 
           {!!previewUrls.length && (
-            <div
-              className={styles.preview}
-              style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
-            >
+            <div className={styles.preview} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               {previewUrls.map((u, idx) => (
                 <img
                   key={u + idx}
                   src={u}
                   alt={`Vista ${idx + 1}`}
-                  style={{
-                    width: 120,
-                    height: 120,
-                    objectFit: "cover",
-                    borderRadius: 10,
-                  }}
+                  style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 10 }}
                 />
               ))}
             </div>
@@ -675,11 +604,7 @@ export default function ProductModal({
             className={styles.btnPrimary}
             onClick={handleSave}
             disabled={!canSave || noBrandOrCategory}
-            title={
-              noBrandOrCategory
-                ? "Necesitas marcas y categorías activas"
-                : undefined
-            }
+            title={noBrandOrCategory ? "Necesitas marcas y categorías activas" : undefined}
           >
             Guardar
           </button>
