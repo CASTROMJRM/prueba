@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactElement } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styles from "./AdminSidebar.module.css";
 import {
@@ -56,11 +56,10 @@ export default function AdminSidebar({ collapsed }: Props) {
     if (catalogActive) setCatalogOpen(true);
   }, [catalogActive]);
 
-
   const renderLink = (item: {
     to: string;
     label: string;
-    icon: JSX.Element;
+    icon: ReactElement;
   }) => (
     <NavLink
       key={item.to}
@@ -78,8 +77,6 @@ export default function AdminSidebar({ collapsed }: Props) {
 
   return (
     <div className={`${styles.wrap} ${collapsed ? styles.wrapCollapsed : ""}`}>
-     
-
       <div className={styles.brand}>
         <NavLink to="/admin" className={styles.brandLink}>
           <img src={Logo} alt="Titanium" className={styles.brandLogo} />
