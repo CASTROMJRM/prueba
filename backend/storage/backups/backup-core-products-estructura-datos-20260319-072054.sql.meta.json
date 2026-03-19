@@ -1,0 +1,37 @@
+{
+  "id": "backup-core-products-estructura-datos-20260319-072054.sql",
+  "filename": "backup-core-products-estructura-datos-20260319-072054.sql",
+  "filePath": "C:\\Users\\Roger\\Desktop\\prueba\\backend\\storage\\backups\\backup-core-products-estructura-datos-20260319-072054.sql",
+  "createdAt": "2026-03-19T07:21:01.739Z",
+  "scope": "table",
+  "schema": "core",
+  "table": "Products",
+  "mode": "schema-and-data",
+  "source": "local",
+  "engine": "postgresql",
+  "backupProvider": "spawn-pg_dump-auto",
+  "tablesIncluded": 1,
+  "rowsIncluded": 17,
+  "sizeBytes": 7834,
+  "sizeKB": "7.65",
+  "format": "sql",
+  "downloadUrl": "/api/admin/backups/download/backup-core-products-estructura-datos-20260319-072054.sql",
+  "restoreGuide": {
+    "type": "Restauración de estructura + datos",
+    "notes": [
+      "Este backup fue generado con pg_dump en formato SQL plano.",
+      "Se restaura con psql.",
+      "El respaldo corresponde a la tabla core.Products."
+    ],
+    "commands": {
+      "restoreSameDatabase": "psql \"postgresql://neondb_owner@ep-dark-flower-akyaoknb-pooler.c-3.us-west-2.aws.neon.tech:5432/neondb?sslmode=require\" -f \"backup-core-products-estructura-datos-20260319-072054.sql\"",
+      "restoreOtherDatabase": "psql \"postgresql://neondb_owner@ep-dark-flower-akyaoknb-pooler.c-3.us-west-2.aws.neon.tech:5432/TU_BASE_DESTINO?sslmode=require\" -f \"backup-core-products-estructura-datos-20260319-072054.sql\""
+    }
+  },
+  "cloudinary": {
+    "assetId": "200a3516d0a0ccf08ed9f6730705a988",
+    "publicId": "titanium/backups/backup-core-products-estructura-datos-20260319-072054.sql",
+    "url": "https://res.cloudinary.com/dqf9pdcte/raw/upload/v1773904862/titanium/backups/backup-core-products-estructura-datos-20260319-072054.sql",
+    "bytes": 7834
+  }
+}

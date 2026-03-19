@@ -399,10 +399,14 @@ const runPgDump = async ({ outputPath, scope, schema, table, mode }) => {
   if (scope === "table") {
     validateIdentifier(schema, "schema");
     validateIdentifier(table, "tabla");
-    args.push("-t", `${schema}.${table}`);
+
+    const qualifiedTable = `"${schema}"."${table}"`;
+    args.push("-t", qualifiedTable);
   }
 
   try {
+    console.log("📦 Ejecutando pg_dump con args:", args);
+
     await spawnCommand(pgDumpBin, args, {
       env: {
         ...process.env,
@@ -418,7 +422,6 @@ const runPgDump = async ({ outputPath, scope, schema, table, mode }) => {
     throw customError;
   }
 };
-
 const uploadBackupToCloudinary = async ({ buffer, filename, metadata }) => {
   if (!isCloudinaryConfigured()) return null;
 
