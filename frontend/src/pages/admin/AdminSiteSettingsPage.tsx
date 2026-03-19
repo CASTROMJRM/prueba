@@ -351,7 +351,7 @@ export default function AdminSiteSettingsPage() {
               <h2 className={styles.cardTitle}>Backups de base de datos</h2>
               <p className={styles.cardDescription}>
                 Genera respaldos completos o por tabla, descárgalos desde la web
-                y opcionalmente súbelos a Cloudinary como archivo JSON.
+                y opcionalmente súbelos a Cloudinary como archivo SQL.
               </p>
             </div>
             <button

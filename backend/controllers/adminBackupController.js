@@ -7,6 +7,7 @@ import cloudinary from "../config/cloudinary.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const backupsDir = path.resolve(__dirname, "../storage/backups");
+const BACKUP_EXTENSION = ".sql";
 
 const ensureBackupsDir = async () => {
   await fs.mkdir(backupsDir, { recursive: true });
@@ -36,9 +37,9 @@ const createTimestamp = () => {
 const getBackupFilename = ({ scope, schema, table }) => {
   const timestamp = createTimestamp();
   if (scope === "table") {
-    return `backup-${slugify(schema)}-${slugify(table)}-${timestamp}.json`;
+    return `backup-${slugify(schema)}-${slugify(table)}-${timestamp}${BACKUP_EXTENSION}`;
   }
-  return `backup-completo-${timestamp}.json`;
+  return `backup-completo-${timestamp}${BACKUP_EXTENSION}`;
 };
 
 const validateIdentifier = (value, fieldName) => {
@@ -47,6 +48,64 @@ const validateIdentifier = (value, fieldName) => {
     error.statusCode = 400;
     throw error;
   }
+};
+
+const escapeSqlIdentifier = (value) => `"${String(value).replace(/"/g, '""')}"`;
+
+const escapeSqlLiteral = (value) => {
+  if (value === null || value === undefined) return "NULL";
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? String(value) : "NULL";
+  }
+  if (typeof value === "bigint") return String(value);
+  if (typeof value === "boolean") return value ? "TRUE" : "FALSE";
+  if (value instanceof Date)
+    return `'${value.toISOString().replace(/'/g, "''")}'`;
+  if (Buffer.isBuffer(value)) return `'\\x${value.toString("hex")}'`;
+
+  if (Array.isArray(value) || typeof value === "object") {
+    return `'${JSON.stringify(value).replace(/'/g, "''")}'::jsonb`;
+  }
+
+  return `'${String(value).replace(/'/g, "''")}'`;
+};
+
+const formatInsertStatement = ({ schema, table, rows }) => {
+  const qualifiedTable = `${escapeSqlIdentifier(schema)}.${escapeSqlIdentifier(table)}`;
+
+  if (!rows.length) {
+    return `-- Tabla ${schema}.${table} sin registros\n`;
+  }
+
+  const columnNames = Object.keys(rows[0]);
+  const columnList = columnNames.map(escapeSqlIdentifier).join(", ");
+  const valuesList = rows
+    .map((row) => {
+      const values = columnNames.map((column) => escapeSqlLiteral(row[column]));
+      return `(${values.join(", ")})`;
+    })
+    .join(",\n");
+
+  return `INSERT INTO ${qualifiedTable} (${columnList}) VALUES\n${valuesList};\n`;
+};
+
+const buildSqlBackupContent = ({ generatedAt, database, scope, tables }) => {
+  const header = [
+    "-- Backup SQL generado automáticamente",
+    `-- Fecha UTC: ${generatedAt}`,
+    `-- Base de datos: ${database || "desconocida"}`,
+    `-- Alcance: ${scope}`,
+    "BEGIN;",
+    "",
+  ];
+
+  const body = tables.flatMap((tableInfo) => [
+    `-- Estructura de datos para ${tableInfo.schema}.${tableInfo.table}`,
+    formatInsertStatement(tableInfo),
+    "",
+  ]);
+
+  return [...header, ...body, "COMMIT;", ""].join("\n");
 };
 
 const getUserTables = async () => {
@@ -81,7 +140,7 @@ const uploadBackupToCloudinary = async ({ buffer, filename, metadata }) => {
     return null;
   }
 
-  const publicId = filename.replace(/\.json$/i, "");
+  const publicId = filename.replace(/\.sql$/i, "");
 
   const result = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -89,8 +148,8 @@ const uploadBackupToCloudinary = async ({ buffer, filename, metadata }) => {
         folder: "titanium/backups",
         resource_type: "raw",
         public_id: publicId,
-        format: "json",
-        tags: ["backup", metadata.scope, metadata.schema || "all"],
+        format: "sql",
+        tags: ["backup", metadata.scope, metadata.schema || "all", "sql"],
         context: Object.entries(metadata)
           .filter(([, value]) => value !== undefined && value !== null)
           .map(([key, value]) => `${key}=${String(value)}`),
@@ -195,6 +254,7 @@ export const getBackupOptions = async (_req, res) => {
         process.env.CLOUDINARY_API_SECRET,
       ),
       backupsPath: backupsDir,
+      backupFormat: "sql",
     });
   } catch (error) {
     return res.status(500).json({
@@ -242,7 +302,8 @@ export const createBackup = async (req, res) => {
     const payload = await buildBackupPayload({ scope, schema, table });
     const filename = getBackupFilename({ scope, schema, table });
     const filePath = path.join(backupsDir, filename);
-    const buffer = Buffer.from(JSON.stringify(payload, null, 2), "utf8");
+    const sqlContent = buildSqlBackupContent(payload);
+    const buffer = Buffer.from(sqlContent, "utf8");
 
     await fs.writeFile(filePath, buffer);
 
@@ -262,6 +323,7 @@ export const createBackup = async (req, res) => {
       ),
       sizeBytes: stats.size,
       sizeKB: bytesToKB(stats.size),
+      format: "sql",
       downloadUrl: `/api/admin/backups/download/${encodeURIComponent(filename)}`,
       cloudinary: null,
     };
@@ -275,6 +337,7 @@ export const createBackup = async (req, res) => {
           schema: metadata.schema,
           table: metadata.table,
           createdAt: metadata.createdAt,
+          format: metadata.format,
         },
       });
     }
@@ -288,8 +351,8 @@ export const createBackup = async (req, res) => {
     return res.status(201).json({
       message:
         scope === "full"
-          ? "Backup completo generado correctamente."
-          : "Backup de tabla generado correctamente.",
+          ? "Backup SQL completo generado correctamente."
+          : "Backup SQL de tabla generado correctamente.",
       backup: metadata,
     });
   } catch (error) {
@@ -305,7 +368,7 @@ export const downloadBackup = async (req, res) => {
     const { filename } = req.params;
     const safeName = path.basename(filename);
 
-    if (!safeName.endsWith(".json")) {
+    if (!safeName.endsWith(BACKUP_EXTENSION)) {
       return res
         .status(400)
         .json({ error: "El archivo solicitado no es válido." });

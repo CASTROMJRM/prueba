@@ -19,6 +19,7 @@ export type BackupRecord = {
   rowsIncluded: number;
   sizeBytes: number;
   sizeKB: string;
+  format?: "sql";
   downloadUrl: string;
   cloudinary: null | {
     assetId: string;
@@ -33,6 +34,7 @@ export type BackupOptionsResponse = {
   tables: BackupTableOption[];
   cloudinaryEnabled: boolean;
   backupsPath: string;
+  backupFormat: "sql"; 
 };
 
 export type BackupListResponse = {
@@ -64,16 +66,51 @@ export async function createBackup(payload: {
   return data;
 }
 
+const normalizeBackupDownloadPath = (downloadUrl: string) => {
+  const baseURL = String(API.defaults.baseURL || "").replace(/\/$/, "");
+
+  if (/^https?:\/\//i.test(downloadUrl)) {
+    return downloadUrl;
+  }
+
+  const normalizedDownloadUrl = downloadUrl.startsWith("/")
+    ? downloadUrl
+    : `/${downloadUrl}`;
+
+  if (!baseURL) {
+    return normalizedDownloadUrl;
+  }
+
+  const apiPrefixMatch = baseURL.match(/(\/api)\/?$/i);
+  if (
+    apiPrefixMatch &&
+    normalizedDownloadUrl.toLowerCase().startsWith(apiPrefixMatch[1].toLowerCase())
+  ) {
+    return normalizedDownloadUrl.slice(apiPrefixMatch[1].length) || "/";
+  }
+
+  return normalizedDownloadUrl;
+};
+
 export const getBackupDownloadUrl = (downloadUrl: string) => {
-  const baseURL = (API.defaults.baseURL || "").replace(/\/$/, "");
-  return `${baseURL}${downloadUrl}`;
+  const normalizedPath = normalizeBackupDownloadPath(downloadUrl);
+  const baseURL = String(API.defaults.baseURL || "").replace(/\/$/, "");
+
+  if (/^https?:\/\//i.test(normalizedPath)) {
+    return normalizedPath;
+  }
+
+  return `${baseURL}${normalizedPath}`;
 };
 
 export async function downloadBackupFile(
   downloadUrl: string,
   filename: string,
 ) {
-  const response = await API.get(downloadUrl, { responseType: "blob" });
+const response = await API.get(normalizeBackupDownloadPath(downloadUrl), {
+    responseType: "blob",
+  });
+
   const blobUrl = window.URL.createObjectURL(response.data);
   const link = document.createElement("a");
   link.href = blobUrl;
