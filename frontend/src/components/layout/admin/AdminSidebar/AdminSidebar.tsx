@@ -14,6 +14,7 @@ import {
   FaBoxes,
   FaServer,
   FaDatabase,
+  FaHdd,
 } from "react-icons/fa";
 import Logo from "../../../../assets/LogoP.png";
 
@@ -32,7 +33,11 @@ const bottomItems = [
   { to: "/admin/suscripciones", label: "Suscripciones", icon: <FaIdCard /> },
   { to: "/admin/reports", label: "Reportes", icon: <FaFileAlt /> },
   { to: "/admin/settings", label: "Gestión del sitio", icon: <FaCog /> },
+];
+
+const monitoringItems = [
   { to: "/admin/monitoring", label: "Monitoreo", icon: <FaServer /> },
+  { to: "/admin/backups", label: "Respaldos", icon: <FaHdd /> },
 ];
 
 const systemItems = [
@@ -46,15 +51,25 @@ interface Props {
 export default function AdminSidebar({ collapsed }: Props) {
   const { pathname } = useLocation();
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [monitoringOpen, setMonitoringOpen] = useState(false);
 
   const catalogActive = useMemo(
     () => catalogItems.some((item) => pathname.startsWith(item.to)),
     [pathname],
   );
 
+  const monitoringActive = useMemo(
+    () => monitoringItems.some((item) => pathname.startsWith(item.to)),
+    [pathname],
+  );
+
   useEffect(() => {
     if (catalogActive) setCatalogOpen(true);
   }, [catalogActive]);
+
+  useEffect(() => {
+    if (monitoringActive) setMonitoringOpen(true);
+  }, [monitoringActive]);
 
   const renderLink = (item: {
     to: string;
@@ -137,6 +152,48 @@ export default function AdminSidebar({ collapsed }: Props) {
 
         {/* Sección de gestión */}
         {bottomItems.map(renderLink)}
+
+         {/* Monitoreo y respaldos */}
+        <div>
+          <button
+            type="button"
+            className={`${styles.catalogToggle} ${monitoringActive ? styles.active : ""}`}
+            onClick={() => setMonitoringOpen((prev) => !prev)}
+            aria-expanded={monitoringOpen}
+            data-tooltip={collapsed ? "Monitoreo" : undefined}
+          >
+            <span className={styles.catalogLeft}>
+              <span className={styles.icon}>
+                <FaServer />
+              </span>
+              {!collapsed && <span className={styles.label}>Monitoreo</span>}
+            </span>
+            {!collapsed && (
+              <span
+                className={`${styles.chevron} ${monitoringOpen ? styles.chevronOpen : ""}`}
+              >
+                <FaChevronRight />
+              </span>
+            )}
+          </button>
+
+          {monitoringOpen && !collapsed && (
+            <div className={styles.submenu}>
+              {monitoringItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `${styles.subLink} ${isActive ? styles.subActive : ""}`
+                  }
+                >
+                  <span className={styles.icon}>{item.icon}</span>
+                  <span className={styles.label}>{item.label}</span>
+                </NavLink>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Sección del sistema */}
         {!collapsed && (

@@ -32,6 +32,7 @@ import AdminLayout from "./components/layout/admin/AdminLayout/AdminLayout";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AdminSiteSettingsPage from "./pages/admin/AdminSiteSettingsPage";
+import AdminBackupsPage from "./pages/admin/AdminBackupsPage";
 import AdminSuscripcionesPage from "./pages/admin/AdminSuscripcionesPage";
 import AdminBrandsPage from "./pages/admin/AdminBrandsPage";
 import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage";
@@ -95,6 +96,7 @@ export default function App() {
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="suscripciones" element={<AdminSuscripcionesPage />} />
           <Route path="settings" element={<AdminSiteSettingsPage />} />
+          <Route path="backups" element={<AdminBackupsPage />} />
           <Route path="brands" element={<AdminBrandsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
         </Route>

@@ -15,8 +15,8 @@ const DEFAULT_SCHEMA = "public";
 const isCloudinaryConfigured = () =>
   Boolean(
     process.env.CLOUDINARY_CLOUD_NAME &&
-      process.env.CLOUDINARY_API_KEY &&
-      process.env.CLOUDINARY_API_SECRET,
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET,
   );
 
 const ensureBackupsDir = async () => {
@@ -146,10 +146,7 @@ const getCandidatePgDumpPaths = () => {
   const candidates = [];
 
   const homeDir =
-    process.env.USERPROFILE ||
-    process.env.HOME ||
-    os.homedir() ||
-    null;
+    process.env.USERPROFILE || process.env.HOME || os.homedir() || null;
 
   if (process.platform === "win32") {
     candidates.push(
@@ -217,10 +214,12 @@ const resolvePgDumpBin = async () => {
 
   for (const candidate of candidates) {
     if (candidate === "pg_dump") {
+      console.log("🔎 Probando pg_dump desde PATH...");
       return candidate;
     }
 
     if (await fileExists(candidate)) {
+      console.log("🔎 Binario encontrado:", candidate);
       return candidate;
     }
   }
@@ -273,7 +272,9 @@ const ensurePgDumpAvailable = async () => {
   const pgDumpBin = await resolvePgDumpBin();
 
   try {
-    await spawnCommand(pgDumpBin, ["--version"]);
+    const result = await spawnCommand(pgDumpBin, ["--version"]);
+    console.log("✅ pg_dump encontrado en:", pgDumpBin);
+    console.log("✅ pg_dump version:", result.stdout || result.stderr);
     return pgDumpBin;
   } catch (error) {
     const customError = new Error(
@@ -314,7 +315,7 @@ const getUserTables = async () => {
     SELECT table_schema, table_name
     FROM information_schema.tables
     WHERE table_type = 'BASE TABLE'
-      AND table_schema NOT IN ('pg_catalog', 'information_schema')
+      AND table_schema NOT IN ('pg_catalog', 'information_schema', 'neon_auth')
     ORDER BY table_schema, table_name;
   `);
 
@@ -386,6 +387,9 @@ const runPgDump = async ({ outputPath, scope, schema, table, mode }) => {
     dbName,
     "-f",
     outputPath,
+    "--exclude-schema=neon_auth",
+    "--exclude-schema=pg_catalog",
+    "--exclude-schema=information_schema",
   ];
 
   if (mode === "data-only") {
@@ -402,6 +406,21 @@ const runPgDump = async ({ outputPath, scope, schema, table, mode }) => {
 
     const qualifiedTable = `"${schema}"."${table}"`;
     args.push("-t", qualifiedTable);
+  } else {
+    const tables = await getUserTables();
+    const uniqueSchemas = [...new Set(tables.map((item) => item.schema))];
+
+    if (uniqueSchemas.length === 0) {
+      const error = new Error(
+        "No se encontraron esquemas válidos para respaldar.",
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    uniqueSchemas.forEach((schemaName) => {
+      args.push("-n", schemaName);
+    });
   }
 
   try {
@@ -422,6 +441,7 @@ const runPgDump = async ({ outputPath, scope, schema, table, mode }) => {
     throw customError;
   }
 };
+
 const uploadBackupToCloudinary = async ({ buffer, filename, metadata }) => {
   if (!isCloudinaryConfigured()) return null;
 
@@ -582,7 +602,8 @@ export const listBackups = async (_req, res) => {
     }
 
     merged.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
 
     return res.json({ backups: merged });
