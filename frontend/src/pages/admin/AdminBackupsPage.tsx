@@ -218,6 +218,7 @@ export default function AdminBackupsPage() {
 
       const response = await createBackup(payload);
 
+      setCreatingBackup(false); 
       pushToast(
         "success",
         "Backup generado",
@@ -371,7 +372,7 @@ export default function AdminBackupsPage() {
 
           <div className={styles.backupInfoGrid}>
             <div className={styles.infoBox}>
-              <strong>Guardado en el Servidor</strong>
+              <strong>Guardado local</strong>
               <span>{backupsPath || "Se detectará al cargar"}</span>
             </div>
             <div className={styles.infoBox}>

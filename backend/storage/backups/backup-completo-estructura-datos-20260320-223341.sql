@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict zEGY4oe2xCfuyesWGTYuzMcjGvDnXa0t7dpYBN9DGp9echwnSlmXxRGHIltCcNB
+\restrict ExftUhHEJjihBJiRVLWYn4G1Sd6phcrygYjytgwn1szzoVxgnohdqkaJoKEx1Uw
 
 -- Dumped from database version 17.8 (a284a84)
 -- Dumped by pg_dump version 18.1
@@ -357,6 +357,9 @@ COPY core."Products" (id, id_producto, name, "brandId", "categoryId", price, sto
 85	15	Cinturón de levantamiento Reebok	8	4	650.00	5	Activo	\N	Ropa	Cinturón de gimnasio diseñado para proteger la zona lumbar durante ejercicios de fuerza como peso muerto o sentadilla	["Soporte lumbar reforzado"]	\N	\N	\N	M / G	Negro / Rojo	Cuero sintético	2026-03-12 22:14:08.377+00	2026-03-12 22:14:08.377+00
 86	16	Guantes de entrenamiento Nike	10	4	420.00	10	Activo	\N	Ropa	Guantes deportivos que mejoran el agarre y protegen las manos durante el levantamiento de pesas.	["Antideslizantes y transpirables"]	\N	\N	\N	CH / M / G	Negro	Poliéster / Spandex	2026-03-12 22:16:59.406+00	2026-03-12 22:16:59.406+00
 87	17	Tennis Prueba	11	5	1500.00	100	Activo	\N	Ropa	Prueba	[]	\N	\N	\N	M	Azul	Algodon	2026-03-16 23:33:59.63+00	2026-03-16 23:33:59.63+00
+90	18	Bandas de resistencia Adidas	9	4	450.00	6	Activo	\N	Ropa	Bandas elásticas ideales para entrenamiento funcional, calentamiento o rehabilitación.	["Diferentes niveles de resistencia"]	\N	\N	\N	Única	Negro	Azul / Negro	2026-03-19 18:12:48.286+00	2026-03-19 18:12:48.286+00
+91	19	Straps de levantamiento Harbinger	9	4	500.00	5	Activo	\N	Ropa	Correas de levantamiento que ayudan a mejorar el agarre en ejercicios como peso muerto o remo.	[]	\N	\N	\N	Única	Negro	Piel	2026-03-19 18:17:17.416+00	2026-03-19 18:17:17.416+00
+96	20	Cinturón de pesas Gymreapers	8	4	390.00	12	Activo	\N	Ropa	Guantes diseñados para mejorar el agarre y reducir ampollas durante el entrenamiento.	["Palma acolchada"]	\N	\N	\N	CH / M / G	Negro / Gris	Poliéster	2026-03-19 18:21:25.094+00	2026-03-19 18:21:25.094+00
 4	4	Tennis Adidas Clásico Negro	2	2	1000.00	10	Activo	https://res.cloudinary.com/dqf9pdcte/image/upload/v1773308505/titanium/products/gijycqnyokjl4almgx0f.jpg	Ropa	Tennis	[]	\N	\N	\N	M	Negro	Algodon	2026-03-12 05:21:21.945547+00	2026-03-12 09:41:45.813+00
 11	11	Tennis Adidas Comfort Beige	2	2	1080.00	11	Activo	https://res.cloudinary.com/dqf9pdcte/image/upload/v1773310154/titanium/products/anb6jws0dpedg7lsjdee.jpg	Ropa	Tennis	[]	\N	\N	\N	M	Beige	Algodon	2026-03-12 05:21:21.945547+00	2026-03-12 10:09:15.026+00
 46	14	Sudadera Alo	7	3	1110.00	10	Activo	https://res.cloudinary.com/dqf9pdcte/image/upload/v1773337807/titanium/products/yr00hgjzp2bslrcnaid3.jpg	Ropa	Sudadera comoda	["Comodo","Fresco"]	\N	\N	\N	M	Negro	Poliester	2026-03-12 17:50:08.201+00	2026-03-12 17:50:08.201+00
@@ -371,6 +374,7 @@ COPY core."Products" (id, id_producto, name, "brandId", "categoryId", price, sto
 
 COPY core."Users" (id, email, password, otp, "otpExpires", "isVerified", "isPendingApproval", "accessToken", "totpSecret", "authMethod", role, provider, "providerId", "passwordChangesCount", "passwordChangesDate", "createdAt", "updatedAt") FROM stdin;
 e2b8251c-a695-40d9-aafc-5cd838525c53	admin@titanium.com	$2b$10$m1NFF4wNJ/gTrXzz2Cw3telkpHFBFsfTFeHJplMR07157oSQJcTJy	\N	\N	t	f	\N	\N	normal	administrador	local	\N	0	\N	2026-03-04 05:02:30.840499+00	2026-03-04 05:02:30.840499+00
+ec96ac21-803c-420b-b329-b8a77ae379dc	castrorosajm@gmail.com	$2b$10$g49tZJxHUd7bXH9KBAHv7.b53EPkj5gIy9Mc.eCH/wMzGx6r4ixay	\N	\N	f	f	\N	\N	normal	cliente	local	\N	0	\N	2026-03-19 07:56:53.047+00	2026-03-19 07:56:53.047+00
 \.
 
 
@@ -466,6 +470,15 @@ f999fd25-a5ae-494a-904c-9758ffbf055f	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbG
 221d7da2-0d9c-40db-beb3-82be89a78e9c	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzczOTA1MzkyLCJleHAiOjE3NzM5MDg5OTJ9.iSlpf9do4Hn-4gudFKckmWVX6NvNBdYOD-PrUAXjOcc	2026-03-19 08:29:52.42+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-19 07:29:52.421+00	2026-03-19 07:29:52.421+00
 d26834c8-2297-4a25-b905-901cc6729519	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzczOTA1NTQwLCJleHAiOjE3NzM5MDkxNDB9.FKgwISK4lnsXL4SMRNF36yenvJD3HiCCXu3nU903Pls	2026-03-19 08:32:20.233+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0	::1	2026-03-19 07:32:20.237+00	2026-03-19 07:32:20.237+00
 322ac561-feb5-4807-b84e-ee9c7fe28122	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzczOTA2MzUyLCJleHAiOjE3NzM5MDk5NTJ9.ue5H__CA_f9z7JERTwkPlaQWidkfgnh0_v2i6bM11Zs	2026-03-19 08:45:52.797+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-19 07:45:52.798+00	2026-03-19 07:45:52.798+00
+fd26a283-f1d3-4fbd-a603-8abcf5a39a48	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzczOTQzNDc3LCJleHAiOjE3NzM5NDcwNzd9.Kj_R4cRBRL-piWarq8UAEuIr_Fd-fjMu-N24i_WmjAA	2026-03-19 19:04:37.65+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-19 18:04:37.651+00	2026-03-19 18:04:37.651+00
+f0f55b9d-e590-4fe2-96ce-531acc00ea78	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzczOTQ0Mzc5LCJleHAiOjE3NzM5NDc5Nzl9.T92cPMhSrNKqw9xOpbSCccagpgccjtT2u9XFyQ-e28s	2026-03-19 19:19:39.297+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-19 18:19:39.297+00	2026-03-19 18:19:39.297+00
+e3371a7a-484b-4dce-86d8-d2adfc5600a2	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzczOTQ3MTQyLCJleHAiOjE3NzM5NTA3NDJ9.OWrNULqeEcJr20-N6D7LpbP0FD4QPD5scpTl2UMN0wY	2026-03-19 20:05:42.977+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-19 19:05:42.978+00	2026-03-19 19:05:42.978+00
+d27c1893-88d9-498e-9ac8-b414ceeca9c1	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzczOTQ5NzA3LCJleHAiOjE3NzM5NTMzMDd9.Bs9TvcJPcio_xEea3DFCbu5qDKt9VTWPwm9rNDXIYik	2026-03-19 20:48:27.898+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-19 19:48:27.899+00	2026-03-19 19:48:27.899+00
+e0ce313b-d890-442a-b176-2c593fa0775f	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzczOTU2Mzg1LCJleHAiOjE3NzM5NTk5ODV9.3hEFu9r6DZM0iDxxWdKRR60n7mm3xJXVEiHQTqxZKp8	2026-03-19 22:39:45.786+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-19 21:39:45.788+00	2026-03-19 21:39:45.788+00
+5047edbc-3f91-45f4-a406-77014f4f534b	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzc0MDQ0NzA0LCJleHAiOjE3NzQwNDgzMDR9.ayN91Dfz3qaO0bOdhMwkJeAF2aWaup-7_YeNjKKeOWM	2026-03-20 23:11:44.607+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-20 22:11:44.609+00	2026-03-20 22:11:44.609+00
+3939e782-576f-4e9d-b30c-8060c8199e28	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzc0MDQ0OTEyLCJleHAiOjE3NzQwNDg1MTJ9.MaQmWmLPbDnaGGPAO3hHH-0HkGOltQNUjYerOP2Rp1A	2026-03-20 23:15:12.64+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-20 22:15:12.641+00	2026-03-20 22:15:12.641+00
+5491d5da-7dc7-4395-8cfe-2bf75c4b2d58	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzc0MDQ1NTcyLCJleHAiOjE3NzQwNDkxNzJ9.JoRWsqMHvls6V-FjvW62pSumW_3Cm0qN3bwh0HDUhDM	2026-03-20 23:26:12.539+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36	::1	2026-03-20 22:26:12.539+00	2026-03-20 22:26:12.539+00
+b6a2c124-2375-4687-b870-2427cd9d753c	e2b8251c-a695-40d9-aafc-5cd838525c53	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyYjgyNTFjLWE2OTUtNDBkOS1hYWZjLTVjZDgzODUyNWM1MyIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiZW1haWwiOiJhZG1pbkB0aXRhbml1bS5jb20iLCJsb2dpbk1ldGhvZCI6ImxvY2FsIiwiaWF0IjoxNzc0MDQ1ODk3LCJleHAiOjE3NzQwNDk0OTd9._3yG9iZzGKtfl6nqqJVRmfMo6d9-Hzz27wbyY-94nfU	2026-03-20 23:31:37.149+00	f	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0	::1	2026-03-20 22:31:37.15+00	2026-03-20 22:31:37.15+00
 \.
 
 
@@ -487,7 +500,7 @@ SELECT pg_catalog.setval('core."Categories_id_seq"', 5, true);
 -- Name: Products_id_seq; Type: SEQUENCE SET; Schema: core; Owner: -
 --
 
-SELECT pg_catalog.setval('core."Products_id_seq"', 89, true);
+SELECT pg_catalog.setval('core."Products_id_seq"', 96, true);
 
 
 --
@@ -643,5 +656,5 @@ ALTER TABLE ONLY core.sessions
 -- PostgreSQL database dump complete
 --
 
-\unrestrict zEGY4oe2xCfuyesWGTYuzMcjGvDnXa0t7dpYBN9DGp9echwnSlmXxRGHIltCcNB
+\unrestrict ExftUhHEJjihBJiRVLWYn4G1Sd6phcrygYjytgwn1szzoVxgnohdqkaJoKEx1Uw
 
