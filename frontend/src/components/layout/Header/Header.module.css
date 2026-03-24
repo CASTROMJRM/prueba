@@ -22,9 +22,20 @@
   transition: all 0.2s ease;
 }
 
+.userMenuBtnTransparent {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(8, 8, 8, 0.18);
+  color: #ffffff;
+  backdrop-filter: blur(14px);
+}
+
 .userMenuBtn:hover {
   border-color: rgba(239, 68, 68, 0.45);
   transform: translateY(-1px);
+}
+
+.userMenuBtnTransparent:hover {
+  border-color: rgba(255, 255, 255, 0.48);
 }
 
 .avatar {
@@ -45,6 +56,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--text, #1a1a1a);
+}
+
+.userMenuBtnTransparent .userText {
+  color: #ffffff;
 }
 
 .dropdown {

@@ -1,5 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
+import { FaShoppingCart } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import menuStyles from "./MobileMenu.module.css";
+import navStyles from "./Navbar/Navbar.module.css";
 
 interface Props {
   onClose: () => void;
@@ -8,6 +12,7 @@ interface Props {
 const MobileMenu = ({ onClose }: Props) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { itemCount, openCart } = useCart();
   const role = user?.rol ?? null;
 
   const handlePortalNavigation = () => {
@@ -19,29 +24,64 @@ const MobileMenu = ({ onClose }: Props) => {
     onClose();
   };
 
+  const handleCartClick = () => {
+    if (!user) navigate("/login");
+    else openCart();
+
+    onClose();
+  };
+
   return (
-    <div className="mobile-menu">
-      <nav className="mobile-nav">
-        <Link to="/" className="mobile-nav-link" onClick={onClose}>
+    <div className={menuStyles.menu}>
+      <nav className={menuStyles.nav}>
+        <Link to="/" className={menuStyles.link} onClick={onClose}>
           INICIO
         </Link>
-        <Link to="/catalogue" className="mobile-nav-link" onClick={onClose}>
+        <Link to="/catalogue" className={menuStyles.link} onClick={onClose}>
           PRODUCTOS
         </Link>
-        <Link to="/suscripciones" className="mobile-nav-link" onClick={onClose}>
+        <Link
+          to="/suscripciones"
+          className={menuStyles.link}
+          onClick={onClose}
+        >
           SUSCRIPCIONES
         </Link>
-        <Link to="/AboutePage" className="mobile-nav-link" onClick={onClose}>
+        <Link to="/AboutePage" className={menuStyles.link} onClick={onClose}>
           ACERCA DE
         </Link>
 
-        <div className="mobile-nav-buttons">
+        <button
+          type="button"
+          className={menuStyles.cartLink}
+          onClick={handleCartClick}
+        >
+          <span className={menuStyles.cartLabel}>
+            <FaShoppingCart />
+            CARRITO
+          </span>
+          {itemCount > 0 && (
+            <span className={menuStyles.cartBadge} aria-hidden="true">
+              {itemCount}
+            </span>
+          )}
+        </button>
+
+        <div className={menuStyles.actions}>
           {!user ? (
             <>
-              <Link to="/register" className="slider-btn-outline" onClick={onClose}>
+              <Link
+                to="/register"
+                className={`${navStyles.btnOutline} ${menuStyles.actionButton}`}
+                onClick={onClose}
+              >
                 SUSCRIBETE
               </Link>
-              <Link to="/login" className="slider-btn-solid" onClick={onClose}>
+              <Link
+                to="/login"
+                className={`${navStyles.btnSolid} ${menuStyles.actionButton}`}
+                onClick={onClose}
+              >
                 INICIA SESION
               </Link>
             </>
@@ -49,7 +89,7 @@ const MobileMenu = ({ onClose }: Props) => {
             <>
               <button
                 type="button"
-                className="slider-btn-outline"
+                className={`${navStyles.btnOutline} ${menuStyles.actionButton}`}
                 onClick={handlePortalNavigation}
               >
                 MI PORTAL
@@ -57,7 +97,7 @@ const MobileMenu = ({ onClose }: Props) => {
               {role === "cliente" && (
                 <Link
                   to="/cliente/configuracion"
-                  className="slider-btn-outline"
+                  className={`${navStyles.btnOutline} ${menuStyles.actionButton}`}
                   onClick={onClose}
                 >
                   CONFIGURACION
@@ -65,7 +105,7 @@ const MobileMenu = ({ onClose }: Props) => {
               )}
               <button
                 type="button"
-                className="slider-btn-solid"
+                className={`${navStyles.btnSolid} ${menuStyles.actionButton}`}
                 onClick={() => {
                   logout();
                   onClose();

@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import "../styles/checkout.css";
 import Logo from "../assets/LogoP.png";
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 export default function CheckoutPage() {
+  const { items: checkoutCartItems } = useCart();
   const [formData, setFormData] = useState({
     // Información de envío
     nombre: "",
@@ -43,7 +45,12 @@ export default function CheckoutPage() {
     },
   ]);
 
-  const handleInputChange = (e) => {
+  const activeCartItems =
+    checkoutCartItems.length > 0 ? checkoutCartItems : cartItems;
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -51,14 +58,14 @@ export default function CheckoutPage() {
     }));
   };
 
-  const subtotal = cartItems.reduce(
+  const subtotal = activeCartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
   const envio = formData.metodoEnvio === "express" ? 99 : 49;
   const total = subtotal + envio;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Aquí iría la lógica para procesar el pago
     console.log("Procesando pago...", formData);
@@ -680,7 +687,7 @@ export default function CheckoutPage() {
               <h3 className="summary-title">RESUMEN DEL PEDIDO</h3>
 
               <div className="order-items">
-                {cartItems.map((item) => (
+                {activeCartItems.map((item) => (
                   <div key={item.id} className="order-item">
                     <img
                       src={item.image}

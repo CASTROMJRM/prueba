@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import styles from "../Navbar/Navbar.module.css";
 import headerStyles from "./Header.module.css";
 
@@ -11,6 +11,7 @@ import {
   FaDumbbell,
   FaIdCard,
   FaInfoCircle,
+  FaShoppingCart,
   FaUserPlus,
   FaSignInAlt,
   FaUserCircle,
@@ -21,6 +22,8 @@ import {
 } from "react-icons/fa";
 
 import { useAuth } from "../../../context/AuthContext";
+import { useCart } from "../../../context/CartContext";
+import CartDrawer from "../../cart/CartDrawer";
 
 type Role = "cliente" | "entrenador" | "administrador";
 
@@ -40,7 +43,9 @@ const sharedNavItems: NavItem[] = [
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
+  const { itemCount, openCart } = useCart();
   const role = (user?.rol ?? null) as Role | null;
 
   const [scrolled, setScrolled] = useState(false);
@@ -71,6 +76,7 @@ export default function Header() {
   }, [role]);
 
   const avatarLetter = (user?.email?.trim()?.[0] ?? "U").toUpperCase();
+  const isTransparentHomeHeader = location.pathname === "/" && !scrolled;
 
   const goPortal = () => {
     if (!role) return navigate("/login");
@@ -79,14 +85,29 @@ export default function Header() {
     return navigate("/entrenador");
   };
 
+  const handleCartClick = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    openCart();
+  };
+
   return (
     <>
       <header
-        className={`${styles.header} ${scrolled ? styles.headerScrolled : ""}`}
+        className={`${styles.header} ${scrolled ? styles.headerScrolled : ""} ${
+          isTransparentHomeHeader ? styles.headerTransparent : ""
+        }`}
       >
         <div className={styles.headerContent}>
-          <div className={styles.logoContainer}>
-            <Link to="/">
+          <div
+            className={`${styles.logoContainer} ${
+              isTransparentHomeHeader ? styles.logoContainerFloating : ""
+            }`}
+          >
+            <Link to="/" className={styles.logoLink}>
               <img
                 src={Logo}
                 alt="Titanium Sport Gym"
@@ -114,6 +135,27 @@ export default function Header() {
             </div>
 
             <div className={styles.navActionLinks}>
+              <span className={styles.navDivider} aria-hidden="true" />
+              <button
+                type="button"
+                className={styles.cartButton}
+                onClick={handleCartClick}
+                aria-label={
+                  user
+                    ? `Abrir carrito de compras${
+                        itemCount > 0 ? ` con ${itemCount} productos` : ""
+                      }`
+                    : "Inicia sesion para acceder al carrito"
+                }
+              >
+                <FaShoppingCart />
+                {itemCount > 0 && (
+                  <span className={styles.cartBadge} aria-hidden="true">
+                    {itemCount}
+                  </span>
+                )}
+              </button>
+
               {!user ? (
                 <>
                   <Link to="/register" className={styles.btnOutline}>
@@ -130,7 +172,11 @@ export default function Header() {
                 >
                   <button
                     type="button"
-                    className={headerStyles.userMenuBtn}
+                    className={`${headerStyles.userMenuBtn} ${
+                      isTransparentHomeHeader
+                        ? headerStyles.userMenuBtnTransparent
+                        : ""
+                    }`}
                     onClick={() => setUserMenuOpen((value) => !value)}
                     aria-label="Abrir menu de usuario"
                   >
@@ -204,6 +250,8 @@ export default function Header() {
       {mobileMenuOpen && (
         <MobileMenu onClose={() => setMobileMenuOpen(false)} />
       )}
+
+      <CartDrawer />
     </>
   );
 }

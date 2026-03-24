@@ -1,10 +1,28 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import "../styles/cataloge.css";
 import Logo from "../assets/LogoP.png";
 import { Link } from "react-router-dom";
+import { useCart, type CartProduct } from "../context/CartContext";
+
+type ProductSpecificationValue = string | number | string[];
+
+type Product = CartProduct & {
+  category: string;
+  featured: boolean;
+  description: string;
+  features: string[];
+  specifications: Record<string, ProductSpecificationValue>;
+};
+
+interface ProductDetailProps {
+  isOpen: boolean;
+  onClose: () => void;
+  product: Product | null;
+  onAddToCart: (product: Product) => void;
+}
 
 // Datos de ejemplo para productos
-const products = [
+const products: Product[] = [
   {
     id: 1,
     name: "Proteína Whey Gold Standard",
@@ -290,129 +308,13 @@ const sortOptions = [
   "MÁS NUEVOS",
 ];
 
-// Componente del Carrito
-function Cart({ isOpen, onClose, cartItems, onUpdateQuantity, onRemoveItem }) {
-  const total = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  if (!isOpen) return null;
-
-  return (
-    <div
-      className="cart-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="cart-title"
-    >
-      <div className="cart-sidebar">
-        <div className="cart-header">
-          <h3 id="cart-title">TU CARRITO</h3>
-          <button
-            onClick={onClose}
-            className="cart-close-btn"
-            aria-label="Cerrar carrito"
-          >
-            <svg
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div className="cart-content">
-          {cartItems.length === 0 ? (
-            <div className="cart-empty">
-              <svg
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <p>Tu carrito está vacío</p>
-            </div>
-          ) : (
-            <>
-              <div className="cart-items">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="cart-item">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="cart-item-image"
-                    />
-                    <div className="cart-item-details">
-                      <h4>{item.name}</h4>
-                      <p className="cart-item-category">{item.category}</p>
-                      <p className="cart-item-price">${item.price}.00 MXN</p>
-                    </div>
-                    <div className="cart-item-controls">
-                      <div className="quantity-controls">
-                        <button
-                          onClick={() =>
-                            onUpdateQuantity(item.id, item.quantity - 1)
-                          }
-                          aria-label={`Reducir cantidad de ${item.name}`}
-                        >
-                          -
-                        </button>
-                        <span aria-live="polite">{item.quantity}</span>
-                        <button
-                          onClick={() =>
-                            onUpdateQuantity(item.id, item.quantity + 1)
-                          }
-                          aria-label={`Aumentar cantidad de ${item.name}`}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => onRemoveItem(item.id)}
-                        className="remove-item-btn"
-                        aria-label={`Eliminar ${item.name} del carrito`}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="cart-footer">
-                <div className="cart-total">
-                  <span>Total:</span>
-                  <span>${total}.00 MXN</span>
-                </div>
-                <Link to="/checkout" className="checkout-btn">
-                  PROCEDER AL PAGO
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Componente de Detalles del Producto
-function ProductDetail({ isOpen, onClose, product, onAddToCart }) {
+function ProductDetail({
+  isOpen,
+  onClose,
+  product,
+  onAddToCart,
+}: ProductDetailProps) {
   if (!isOpen || !product) return null;
 
   return (
@@ -537,36 +439,34 @@ function ProductDetail({ isOpen, onClose, product, onAddToCart }) {
 
 // Componente principal del catálogo
 export default function CatalogoPage() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { addItem } = useCart();
+  const legacyHeaderEnabled = false;
+  const scrolled = false;
+  const mobileMenuOpen = false;
+  const setMobileMenuOpen = (_value: boolean) => {};
+  const cartItems: Array<{ quantity: number }> = [];
+  const setIsCartOpen = (_value: boolean) => {};
   const [selectedCategory, setSelectedCategory] = useState("TODOS");
   const [sortBy, setSortBy] = useState("RECOMENDADO");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(products);
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const productsPerPage = 8;
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Filtrar productos cuando cambia la categoría, búsqueda o el orden
   useEffect(() => {
-    let filtered = products;
+    let filtered = [...products];
 
     // Filtrar por búsqueda
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(product => 
-        product.name.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.category.toLowerCase().includes(query) ||
+          product.description.toLowerCase().includes(query)
       );
     }
 
@@ -603,40 +503,12 @@ export default function CatalogoPage() {
   }, [selectedCategory, sortBy, searchQuery]);
 
   // Funciones del carrito
-  const addToCart = (product) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
-    });
-  };
-
-  const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity < 1) {
-      removeFromCart(productId);
-      return;
-    }
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === productId ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  const removeFromCart = (productId) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.id !== productId)
-    );
+  const addToCart = (product: Product) => {
+    addItem(product);
   };
 
   // Funciones para detalles del producto
-  const openProductDetail = (product) => {
+  const openProductDetail = (product: Product) => {
     setSelectedProduct(product);
     setIsProductDetailOpen(true);
   };
@@ -655,7 +527,7 @@ export default function CatalogoPage() {
   );
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
-  const paginate = (pageNumber) => setCurrentPageNumber(pageNumber);
+  const paginate = (pageNumber: number) => setCurrentPageNumber(pageNumber);
 
   return (
     <div className="page-container">
@@ -666,8 +538,10 @@ export default function CatalogoPage() {
         <div className="bg-glow bg-glow-2" />
       </div>
 
-      {/* Header */}
-      <header className={`header ${scrolled ? "header-scrolled" : ""}`}>
+      {legacyHeaderEnabled && (
+        <>
+          {/* Header */}
+          <header className={`header ${scrolled ? "header-scrolled" : ""}`}>
         <div className="header-content">
           <div className="logo-container">
             <Link to="/" aria-label="Ir al inicio de Titanium Sport Gym">
@@ -858,7 +732,9 @@ export default function CatalogoPage() {
             </nav>
           </div>
         )}
-      </header>
+          </header>
+        </>
+      )}
 
       {/* Breadcrumbs */}
       <nav className="breadcrumbs" aria-label="Ruta de navegación">
@@ -1095,17 +971,6 @@ export default function CatalogoPage() {
         </section>
 
       </main>
-
-     
-
-      {/* Componente del Carrito */}
-      <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeFromCart}
-      />
 
       {/* Componente de Detalles del Producto */}
       <ProductDetail
