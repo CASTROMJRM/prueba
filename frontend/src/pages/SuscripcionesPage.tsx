@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "../styles/suscripciones.css";
 import { Link } from "react-router-dom";
 import Navbar from "../components/layout/Navbar/Navbar";
@@ -98,8 +98,6 @@ const services = [
 export default function ServicesPage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState("Servicios");
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -176,14 +174,14 @@ export default function ServicesPage() {
               <a
                 href="#"
                 className="mobile-nav-link active"
-                onClick={() => setCurrentPage("Servicios")}
+                onClick={(event) => event.preventDefault()}
               >
                 SERVICIOS
               </a>
               <a
                 href="#"
                 className="mobile-nav-link"
-                onClick={() => setCurrentPage("Acerca de")}
+                onClick={(event) => event.preventDefault()}
               >
                 ACERCA DE
               </a>

@@ -1,4 +1,3 @@
-// src/components/layout/Header/Header.tsx
 import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import styles from "../Navbar/Navbar.module.css";
@@ -7,7 +6,6 @@ import headerStyles from "./Header.module.css";
 import Logo from "../../../assets/LogoP.png";
 import MobileMenu from "../MobileMenu";
 
-// Icons
 import {
   FaHome,
   FaDumbbell,
@@ -33,6 +31,13 @@ type NavItem = {
   end?: boolean;
 };
 
+const sharedNavItems: NavItem[] = [
+  { to: "/", label: "INICIO", icon: FaHome, end: true },
+  { to: "/catalogue", label: "PRODUCTOS", icon: FaDumbbell },
+  { to: "/suscripciones", label: "SUSCRIPCIONES", icon: FaIdCard },
+  { to: "/AboutePage", label: "ACERCA DE NOSOTROS", icon: FaInfoCircle },
+];
+
 export default function Header() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -48,7 +53,6 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Cierra menú de usuario al hacer click fuera
   useEffect(() => {
     const onDocClick = () => setUserMenuOpen(false);
     if (userMenuOpen) document.addEventListener("click", onDocClick);
@@ -56,37 +60,8 @@ export default function Header() {
   }, [userMenuOpen]);
 
   const navItems: NavItem[] = useMemo(() => {
-    // PÚBLICO
-    if (!role) {
-      return [
-        { to: "/", label: "INICIO", icon: FaHome, end: true },
-        { to: "/catalogue", label: "PRODUCTOS", icon: FaDumbbell },
-        { to: "/suscripciones", label: "SUSCRIPCIONES", icon: FaIdCard },
-        { to: "/AboutePage", label: "ACERCA DE", icon: FaInfoCircle },
-      ];
-    }
+    if (role !== "administrador") return sharedNavItems;
 
-    // CLIENTE
-    if (role === "cliente") {
-      return [
-        { to: "/", label: "INICIO", icon: FaHome, end: true },
-        { to: "/catalogue", label: "PRODUCTOS", icon: FaDumbbell },
-        { to: "/suscripciones", label: "SUSCRIPCIONES", icon: FaIdCard },
-        { to: "/cliente", label: "MI PORTAL", icon: FaUser },
-      ];
-    }
-
-    // ENTRENADOR
-    if (role === "entrenador") {
-      return [
-        { to: "/", label: "INICIO", icon: FaHome, end: true },
-        { to: "/catalogue", label: "PRODUCTOS", icon: FaDumbbell },
-        { to: "/suscripciones", label: "SUSCRIPCIONES", icon: FaIdCard },
-        { to: "/entrenador", label: "PANEL", icon: FaCogs },
-      ];
-    }
-
-    // ADMIN
     return [
       { to: "/", label: "INICIO", icon: FaHome, end: true },
       { to: "/admin", label: "ADMIN", icon: FaCogs },
@@ -106,7 +81,9 @@ export default function Header() {
 
   return (
     <>
-      <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ""}`}>
+      <header
+        className={`${styles.header} ${scrolled ? styles.headerScrolled : ""}`}
+      >
         <div className={styles.headerContent}>
           <div className={styles.logoContainer}>
             <Link to="/">
@@ -118,7 +95,6 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop nav */}
           <nav className={styles.navDesktop}>
             <div className={styles.navMainLinks}>
               {navItems.map((item) => (
@@ -141,10 +117,10 @@ export default function Header() {
               {!user ? (
                 <>
                   <Link to="/register" className={styles.btnOutline}>
-                    <FaUserPlus /> SUSCRÍBETE
+                    <FaUserPlus /> SUSCRIBETE
                   </Link>
                   <Link to="/login" className={styles.btnSolid}>
-                    <FaSignInAlt /> INICIA SESIÓN
+                    <FaSignInAlt /> INICIA SESION
                   </Link>
                 </>
               ) : (
@@ -155,8 +131,8 @@ export default function Header() {
                   <button
                     type="button"
                     className={headerStyles.userMenuBtn}
-                    onClick={() => setUserMenuOpen((v) => !v)}
-                    aria-label="Abrir menú de usuario"
+                    onClick={() => setUserMenuOpen((value) => !value)}
+                    aria-label="Abrir menu de usuario"
                   >
                     <span className={headerStyles.avatar}>{avatarLetter}</span>
                     <span className={headerStyles.userText}>{user.email}</span>
@@ -173,7 +149,6 @@ export default function Header() {
                         <FaUserCircle /> Mi portal
                       </button>
 
-                      {/* ✅ Perfil */}
                       {role === "cliente" && (
                         <button
                           className={headerStyles.dropdownItem}
@@ -184,14 +159,13 @@ export default function Header() {
                         </button>
                       )}
 
-                      {/* ✅ Configuración 2FA (cliente) */}
                       {role === "cliente" && (
                         <button
                           className={headerStyles.dropdownItem}
                           type="button"
                           onClick={() => navigate("/cliente/configuracion")}
                         >
-                          <FaCogs /> Configuración (2FA)
+                          <FaCogs /> Configuracion (2FA)
                         </button>
                       )}
 
@@ -205,7 +179,7 @@ export default function Header() {
                           navigate("/login");
                         }}
                       >
-                        <FaSignOutAlt /> Cerrar sesión
+                        <FaSignOutAlt /> Cerrar sesion
                       </button>
                     </div>
                   )}
@@ -214,11 +188,10 @@ export default function Header() {
             </div>
           </nav>
 
-          {/* Mobile button */}
           <button
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             className={styles.mobileMenuBtn}
-            aria-label="Abrir menú"
+            aria-label="Abrir menu"
             type="button"
           >
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -228,7 +201,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile menu */}
       {mobileMenuOpen && (
         <MobileMenu onClose={() => setMobileMenuOpen(false)} />
       )}
