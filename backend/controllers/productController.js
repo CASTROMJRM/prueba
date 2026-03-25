@@ -14,35 +14,102 @@ const parseJsonArray = (raw) => {
   }
 };
 
+const productIncludes = [
+  { model: Brand, attributes: ["id_marca", "name"] },
+  { model: Category, attributes: ["id_categoria", "name"] },
+  {
+    model: ProductImage,
+    as: "images",
+    attributes: ["id", "url", "order"],
+    where: { active: true },
+    required: false,
+  },
+];
+
+const normalizeProductFeatures = (raw) => {
+  if (Array.isArray(raw)) {
+    return raw.filter((item) => typeof item === "string");
+  }
+
+  return parseJsonArray(raw);
+};
+
+const serializeProduct = (product) => {
+  const json = product?.toJSON ? product.toJSON() : product;
+  const images = Array.isArray(json.images) ? [...json.images] : [];
+
+  images.sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0));
+
+  return {
+    ...json,
+    features: normalizeProductFeatures(json.features),
+    images,
+    imageUrl: json.imageUrl || (images[0]?.url ?? null),
+    brandName: json.Brand?.name ?? null,
+    categoryName: json.Category?.name ?? null,
+  };
+};
+
+const fetchProducts = async ({ onlyActive = false } = {}) => {
+  const where = onlyActive ? { status: "Activo" } : undefined;
+
+  const products = await Product.findAll({
+    ...(where ? { where } : {}),
+    include: productIncludes,
+    order: [["createdAt", "DESC"]],
+  });
+
+  return products.map(serializeProduct);
+};
+
 export const listProducts = async (req, res) => {
   try {
-    const products = await Product.findAll({
-      include: [
-        { model: Brand, attributes: ["id_marca", "name"] },
-        { model: Category, attributes: ["id_categoria", "name"] },
-        {
-          model: ProductImage,
-          as: "images",
-          attributes: ["id", "url", "order"],
-          where: { active: true },
-          required: false,
-        },
-      ],
-      order: [["createdAt", "DESC"]],
-    });
-
-    const out = products.map((p) => {
-      const json = p.toJSON();
-      const imgs = Array.isArray(json.images) ? json.images : [];
-      imgs.sort((a, b) => Number(a.order) - Number(b.order));
-      return { ...json, images: imgs };
-    });
-
+    const out = await fetchProducts();
     return res.json(out);
   } catch (err) {
     console.error("listProducts error:", err);
     return res.status(500).json({
       error: "Error listando productos",
+      details: err.message,
+    });
+  }
+};
+
+export const listPublicProducts = async (req, res) => {
+  try {
+    const out = await fetchProducts({ onlyActive: true });
+    return res.json(out);
+  } catch (err) {
+    console.error("listPublicProducts error:", err);
+    return res.status(500).json({
+      error: "Error listando productos",
+      details: err.message,
+    });
+  }
+};
+
+export const getPublicProductById = async (req, res) => {
+  try {
+    const id_producto = Number(req.params.id);
+
+    if (!Number.isInteger(id_producto)) {
+      return res.status(400).json({ error: "Id de producto invalido" });
+    }
+
+    const product = await Product.findOne({
+      where: { id_producto, status: "Activo" },
+      include: productIncludes,
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    return res.json(serializeProduct(product));
+  } catch (err) {
+    console.error("getPublicProductById error:", err);
+    return res.status(500).json({
+      error: "Error obteniendo producto",
       details: err.message,
     });
   }
