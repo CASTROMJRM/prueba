@@ -37,6 +37,7 @@ import AdminSuscripcionesPage from "./pages/admin/AdminSuscripcionesPage";
 import AdminBrandsPage from "./pages/admin/AdminBrandsPage";
 import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage";
 import AdminSummaryPage from "./pages/admin/AdminSummaryPage";
+import AdminAboutPage from "./pages/admin/AdminAboutPage";
 
 // Client Portal
 import ClientPortalLayout from "./components/layout/client/ClientPortalLayout/ClientPortalLayout";
@@ -100,6 +101,7 @@ export default function App() {
           <Route path="backups" element={<AdminBackupsPage />} />
           <Route path="brands" element={<AdminBrandsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
+          <Route path="about" element={<AdminAboutPage />} />
         </Route>
       </Route>
 

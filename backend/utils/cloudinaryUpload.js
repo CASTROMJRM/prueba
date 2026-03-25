@@ -1,4 +1,3 @@
-// backend/utils/cloudinaryUpload.js
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -20,7 +19,9 @@ export const uploadBufferToCloudinary = (buffer, folder = "titanium/products") =
     stream.end(buffer);
   });
 
-export const deleteFromCloudinary = async (publicId) => {
+export const destroyCloudinaryImage = async (publicId) => {
   if (!publicId) return;
-  await cloudinary.uploader.destroy(publicId);
+  await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
 };
+
+export const deleteFromCloudinary = destroyCloudinaryImage;

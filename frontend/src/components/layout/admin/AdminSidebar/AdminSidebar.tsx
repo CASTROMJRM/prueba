@@ -15,6 +15,7 @@ import {
   FaServer,
   FaDatabase,
   FaHdd,
+FaInfoCircle
 } from "react-icons/fa";
 import Logo from "../../../../assets/LogoP.png";
 
@@ -33,6 +34,7 @@ const bottomItems = [
   { to: "/admin/suscripciones", label: "Suscripciones", icon: <FaIdCard /> },
   { to: "/admin/reports", label: "Reportes", icon: <FaFileAlt /> },
   { to: "/admin/settings", label: "Gestión del sitio", icon: <FaCog /> },
+  { to: "about", label: "About / Nosotros", icon: <FaInfoCircle /> },
 ];
 
 const monitoringItems = [
