@@ -14,12 +14,9 @@ import {
 import styles from "./CatalogePage.module.css";
 import { useCart } from "../../context/CartContext";
 import {
-  type CatalogProductView,
-  catalogCategories,
-  catalogSortOptions,
-  getAllCatalogProducts,
-  getCatalogProductPath,
-} from "./catalogData";
+  getCatalogProducts,
+  type CatalogProductDTO,
+} from "../../services/catalogService";
 
 const cx = (...names: Array<string | null | undefined | false>) =>
   names
@@ -28,8 +25,60 @@ const cx = (...names: Array<string | null | undefined | false>) =>
     .filter(Boolean)
     .join(" ");
 
+type CatalogProductView = {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  rating: number;
+  reviewCount: number;
+  featured: boolean;
+  badge?: string;
+  stock: number;
+};
+
+const catalogSortOptions = [
+  "RECOMENDADO",
+  "PRECIO: MENOR A MAYOR",
+  "PRECIO: MAYOR A MENOR",
+  "MAS POPULARES",
+  "MAS NUEVOS",
+];
+
+const getCatalogProductPath = (id: string) => `/catalogo/${id}`;
+
+const mapCatalogProductToView = (
+  product: CatalogProductDTO
+): CatalogProductView => ({
+  id: product.id,
+  name: product.name,
+  category: product.categoryName || product.productType || "General",
+  description:
+    product.description?.trim() || "Producto disponible en Titanium Shop.",
+  price: Number(product.price ?? 0),
+  originalPrice: undefined,
+  image:
+    product.imageUrl ||
+    product.images?.[0]?.url ||
+    "https://via.placeholder.com/600x600?text=Producto",
+  rating: 5,
+  reviewCount: 0,
+  featured: Number(product.stock ?? 0) > 0,
+  badge:
+    product.productType === "Suplementación"
+      ? "Suplemento"
+      : product.productType === "Ropa"
+        ? "Ropa"
+        : undefined,
+  stock: Number(product.stock ?? 0),
+});
+
 export default function CatalogoPage() {
   const { addItem, openCart } = useCart();
+
   const [selectedCategory, setSelectedCategory] = useState("TODOS");
   const [sortBy, setSortBy] = useState("RECOMENDADO");
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,10 +86,42 @@ export default function CatalogoPage() {
   const [favorites, setFavorites] = useState<Set<CatalogProductView["id"]>>(
     new Set()
   );
+  const [products, setProducts] = useState<CatalogProductView[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const productsPerPage = 8;
 
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data = await getCatalogProducts();
+        const mappedProducts = data.map(mapCatalogProductToView);
+
+        setProducts(mappedProducts);
+      } catch (err) {
+        console.error("Error cargando catálogo:", err);
+        setError("No se pudieron cargar los productos.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  const catalogCategories = useMemo(() => {
+    const dynamicCategories = Array.from(
+      new Set(products.map((product) => product.category).filter(Boolean))
+    );
+    return ["TODOS", ...dynamicCategories];
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
-    let filtered = getAllCatalogProducts();
+    let filtered = [...products];
 
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
@@ -75,7 +156,7 @@ export default function CatalogoPage() {
     }
 
     return filtered;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [products, searchQuery, selectedCategory, sortBy]);
 
   useEffect(() => {
     setCurrentPageNumber(1);
@@ -97,7 +178,7 @@ export default function CatalogoPage() {
         : "Todos los productos";
 
   const addToCart = (product: CatalogProductView) => {
-    addItem(product);
+    addItem(product as never);
     openCart();
   };
 
@@ -146,11 +227,11 @@ export default function CatalogoPage() {
 
             <div className={cx("catalogStats")}>
               <div className={cx("catalogStat")}>
-                <strong>{getAllCatalogProducts().length}</strong>
+                <strong>{products.length}</strong>
                 <span>Productos</span>
               </div>
               <div className={cx("catalogStat")}>
-                <strong>{catalogCategories.length - 1}</strong>
+                <strong>{Math.max(catalogCategories.length - 1, 0)}</strong>
                 <span>Categorias</span>
               </div>
             </div>
@@ -241,7 +322,19 @@ export default function CatalogoPage() {
               </div>
             </div>
 
-            {filteredProducts.length === 0 ? (
+            {loading ? (
+              <div className={cx("catalogEmptyState")}>
+                <h3 className={cx("catalogEmptyTitle")}>Cargando productos...</h3>
+                <p className={cx("catalogEmptyText")}>
+                  Estamos obteniendo el catalogo desde el servidor.
+                </p>
+              </div>
+            ) : error ? (
+              <div className={cx("catalogEmptyState")}>
+                <h3 className={cx("catalogEmptyTitle")}>Ocurrio un problema</h3>
+                <p className={cx("catalogEmptyText")}>{error}</p>
+              </div>
+            ) : filteredProducts.length === 0 ? (
               <div className={cx("catalogEmptyState")}>
                 <span className={cx("catalogEmptyIcon")}>
                   <FaSearch />
@@ -355,9 +448,10 @@ export default function CatalogoPage() {
                               type="button"
                               className={cx("catalogAddToCartButton")}
                               onClick={() => addToCart(product)}
+                              disabled={product.stock <= 0}
                             >
                               <FaShoppingCart />
-                              Agregar al carrito
+                              {product.stock > 0 ? "Agregar al carrito" : "Sin stock"}
                             </button>
                             <Link
                               to={getCatalogProductPath(product.id)}
