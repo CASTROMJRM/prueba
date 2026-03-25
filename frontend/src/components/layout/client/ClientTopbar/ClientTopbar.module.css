@@ -1,4 +1,5 @@
 .topbar {
+  min-height: 88px;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -6,40 +7,60 @@
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  min-height: 88px;
-  padding: 18px 24px;
+  padding: 12px 18px;
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .left,
 .right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .left {
   min-width: 0;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brandLogo {
+  width: 200px;
+  height: 100px;
+  object-fit: contain;
+  display: block;
+}
+
 .copy {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .breadcrumbs {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #7b7f87;
+  color: #6b6b6b;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.crumb {
+  color: #8b9098;
 }
 
 .crumbActive {
-  color: #111827;
+  color: #111111;
 }
 
 .sep {
@@ -47,23 +68,22 @@
 }
 
 .title {
-  margin: 6px 0 0;
-  font-size: 28px;
+  margin: 2px 0 0;
+  font-size: 19px;
   line-height: 1.05;
-  color: #111827;
+  color: #111111;
+  font-weight: 800;
 }
 
 .description {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: #6b7280;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .menuBtn,
-.logoutButton,
-.actionButton,
-.actionButtonSoft {
+.iconBtn {
   border: 0;
   cursor: pointer;
   transition:
@@ -73,119 +93,76 @@
 }
 
 .menuBtn,
-.logoutButton {
+.iconBtn {
   width: 42px;
   height: 42px;
-  border-radius: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
   background: #ffffff;
-  color: #111827;
-  border: 1px solid rgba(17, 24, 39, 0.1);
+  color: #111111;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .menuBtn:hover,
-.logoutButton:hover,
-.actionButton:hover,
-.actionButtonSoft:hover {
+.iconBtn:hover {
   transform: translateY(-1px);
-}
-
-.actionButton,
-.actionButtonSoft {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 0 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.actionButton {
-  background: #111827;
-  color: #ffffff;
-  box-shadow: 0 14px 24px rgba(17, 24, 39, 0.18);
-}
-
-.actionButtonSoft {
-  background: rgba(219, 36, 28, 0.08);
-  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.35);
 }
 
 .profile {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 10px;
   padding: 6px 10px;
-  border-radius: 18px;
-  background: #ffffff;
-  border: 1px solid rgba(17, 24, 39, 0.08);
+  padding-left: 8px;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
+  background: #111111;
+  color: #ffffff;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #db241c 0%, #ef4444 100%);
-  color: #ffffff;
   font-weight: 800;
 }
 
 .profileText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  line-height: 1.1;
 }
 
 .profileText strong {
-  max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: block;
   font-size: 13px;
-  color: #111827;
+  font-weight: 800;
+  color: #111111;
 }
 
 .profileText span {
   font-size: 11px;
-  color: #6b7280;
+  color: #666666;
 }
 
 @media (max-width: 1180px) {
-  .actionButtonSoft,
-  .profileText span {
+  .description {
     display: none;
   }
 }
 
-@media (max-width: 980px) {
-  .topbar {
-    padding: 16px;
-  }
-
-  .profileText {
-    display: none;
+@media (min-width: 900px) {
+  .profile {
+    display: flex;
   }
 }
 
-@media (max-width: 720px) {
-  .topbar {
-    flex-direction: column;
-    align-items: stretch;
+@media (max-width: 768px) {
+  .brand {
+    display: none;
   }
 
-  .left,
-  .right {
-    width: 100%;
-  }
-
-  .right {
-    justify-content: space-between;
+  .breadcrumbs {
+    display: none;
   }
 }

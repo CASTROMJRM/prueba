@@ -11,6 +11,7 @@ export interface ClientPortalItem {
   to: string;
   label: string;
   description: string;
+  heading?: string;
   icon: IconType;
   end?: boolean;
 }
@@ -28,6 +29,7 @@ export const clientPortalSections: ClientPortalSection[] = [
         to: "/cliente",
         label: "Resumen",
         description: "Vista general de tu cuenta, progreso y accesos rapidos.",
+        heading: "Resumen general",
         icon: FaChartPie,
         end: true,
       },
@@ -35,6 +37,7 @@ export const clientPortalSections: ClientPortalSection[] = [
         to: "/cliente/perfil",
         label: "Mi perfil",
         description: "Actualiza tus datos fisicos y tu panel de prediccion.",
+        heading: "Mi perfil",
         icon: FaUserCircle,
       },
     ],
@@ -46,12 +49,14 @@ export const clientPortalSections: ClientPortalSection[] = [
         to: "/cliente/suscripcion",
         label: "Mi suscripcion",
         description: "Consulta el estado de tu membresia y beneficios activos.",
+        heading: "Mi suscripcion",
         icon: FaCreditCard,
       },
       {
         to: "/cliente/pagos",
         label: "Pagos",
         description: "Revisa tus movimientos, proximos cargos y comprobantes.",
+        heading: "Pagos",
         icon: FaWallet,
       },
     ],
@@ -63,6 +68,7 @@ export const clientPortalSections: ClientPortalSection[] = [
         to: "/cliente/configuracion",
         label: "Seguridad",
         description: "Configura tu acceso y la verificacion en dos pasos.",
+        heading: "Seguridad",
         icon: FaShieldAlt,
       },
     ],
@@ -80,13 +86,15 @@ export function getClientPortalMeta(pathname: string) {
 
   if (!matchedItem) {
     return {
-      title: "Portal del cliente",
+      title: "Portal cliente",
       description: "Gestiona tu perfil, pagos y configuracion de la cuenta.",
+      breadcrumb: "INICIO",
     };
   }
 
   return {
-    title: matchedItem.label,
+    title: matchedItem.heading ?? matchedItem.label,
     description: matchedItem.description,
+    breadcrumb: matchedItem.label.toUpperCase(),
   };
 }

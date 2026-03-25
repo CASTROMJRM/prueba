@@ -3,19 +3,21 @@ import {
   FaBars,
   FaHome,
   FaSignOutAlt,
-  FaUserCircle,
 } from "react-icons/fa";
+import Logo from "../../../../assets/LogoP.png";
 import { useAuth } from "../../../../context/AuthContext";
 import styles from "./ClientTopbar.module.css";
 
 interface ClientTopbarProps {
   title: string;
+  breadcrumb: string;
   description: string;
   onToggleSidebar: () => void;
 }
 
 export default function ClientTopbar({
   title,
+  breadcrumb,
   description,
   onToggleSidebar,
 }: ClientTopbarProps) {
@@ -34,11 +36,15 @@ export default function ClientTopbar({
           <FaBars />
         </button>
 
+        <div className={styles.brand}>
+          <img src={Logo} alt="Titanium" className={styles.brandLogo} />
+        </div>
+
         <div className={styles.copy}>
           <div className={styles.breadcrumbs}>
             <span className={styles.crumb}>PORTAL CLIENTE</span>
             <span className={styles.sep}>/</span>
-            <span className={styles.crumbActive}>{title.toUpperCase()}</span>
+            <span className={styles.crumbActive}>{breadcrumb}</span>
           </div>
           <h1 className={styles.title}>{title}</h1>
           <p className={styles.description}>{description}</p>
@@ -48,20 +54,12 @@ export default function ClientTopbar({
       <div className={styles.right}>
         <button
           type="button"
-          className={styles.actionButton}
+          className={styles.iconBtn}
           onClick={() => navigate("/")}
+          aria-label="Ir al sitio"
+          title="Ir al sitio"
         >
           <FaHome />
-          Ir al sitio
-        </button>
-
-        <button
-          type="button"
-          className={styles.actionButtonSoft}
-          onClick={() => navigate("/cliente/perfil")}
-        >
-          <FaUserCircle />
-          Mi perfil
         </button>
 
         <div className={styles.profile}>
@@ -70,13 +68,13 @@ export default function ClientTopbar({
           </div>
           <div className={styles.profileText}>
             <strong>{user?.email ?? "cliente@titanium.com"}</strong>
-            <span>Sesion activa</span>
+            <span>Cliente</span>
           </div>
         </div>
 
         <button
           type="button"
-          className={styles.logoutButton}
+          className={styles.iconBtn}
           onClick={() => {
             logout();
           }}

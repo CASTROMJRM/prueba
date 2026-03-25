@@ -1,15 +1,13 @@
 .shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 286px minmax(0, 1fr);
-  background:
-    radial-gradient(circle at top right, rgba(219, 36, 28, 0.08), transparent 22%),
-    #f4f5f7;
+  grid-template-columns: 280px minmax(0, 1fr);
+  background: var(--bg, #f7f4ee);
   transition: grid-template-columns 0.28s ease;
 }
 
 .shellCollapsed {
-  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-columns: 80px minmax(0, 1fr);
 }
 
 .sidebar {

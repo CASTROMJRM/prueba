@@ -34,6 +34,7 @@ export default function ClientPortalLayout() {
       <main className={styles.main}>
         <ClientTopbar
           title={meta.title}
+          breadcrumb={meta.breadcrumb}
           description={meta.description}
           onToggleSidebar={toggleSidebar}
         />

@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import Logo from "../../../../assets/LogoP.png";
+import Logo from "../../../../assets/logo_ULTRA_HD-removebg-preview.png";
 import styles from "./ClientSidebar.module.css";
 import { clientPortalSections } from "../clientPortalNavigation";
 

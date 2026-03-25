@@ -152,16 +152,23 @@ body {
 .auth-input-icon {
   position: absolute;
   left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
+  justify-content: center;
   pointer-events: none;
   color: #999999;
   z-index: 1;
 }
 
 .auth-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
+  display: block;
+  flex-shrink: 0;
 }
 
 /* Input Fields - Estilo SmartFit (solo border-bottom) */
@@ -186,22 +193,47 @@ body {
   color: #bbbbbb;
 }
 
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover,
+.auth-input:-webkit-autofill:focus,
+.auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #1a1a1a;
+  caret-color: #1a1a1a;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  border-bottom: 2px solid #e0e0e0;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 /* Eye Button for Password */
 .auth-eye-btn {
   position: absolute;
   right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
+  appearance: none;
+  -webkit-appearance: none;
   padding: 8px;
+  width: 34px;
+  height: 34px;
   cursor: pointer;
   color: #999999;
   transition: color 0.3s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-size: 0;
 }
 
 .auth-eye-btn:hover {
   color: #ef4444;
+}
+
+.auth-input::-ms-reveal,
+.auth-input::-ms-clear {
+  display: none;
 }
 
 /* Remember + Forgot Row */
@@ -243,6 +275,24 @@ body {
 .auth-link:hover {
   color: #dc2c1e;
   text-decoration: underline;
+}
+
+.auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  color: #b91c1c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.auth-error svg {
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 /* Primary Button */
@@ -772,9 +822,26 @@ body {
   align-items: center;
   justify-content: center;
   gap: 12px;
+  width: 100%;
   padding: 12px 16px;
-  height: 48px;           /* o el alto que uses */
-  overflow: hidden;       /* evita que el svg se salga */
+  height: 48px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  border-radius: 50px;
+  background: #ffffff;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-btn-google:hover {
+  border-color: #db241c;
+  color: #db241c;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
 }
 
 .auth-btn-google img {
@@ -783,4 +850,38 @@ body {
   object-fit: contain;
   display: block;
   flex: 0 0 auto;
+}
+
+.auth-btn-google svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.auth-check-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.auth-check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.auth-check-item .auth-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.auth-check-item-ok {
+  color: #16a34a;
+}
+
+.auth-check-item-pending {
+  color: #777777;
 }
