@@ -1,10 +1,11 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FaChevronRight, FaHome } from "react-icons/fa";
 import CatalogProductDetail from "../../components/catalog/CatalogProductDetail";
 import { useCart } from "../../context/CartContext";
 import {
-  getCatalogProductById,
+  fetchCatalogProductById,
   getCatalogProductPath,
   type CatalogProductView,
 } from "./catalogData";
@@ -20,11 +21,52 @@ const cx = (...names: Array<string | null | undefined | false>) =>
 export default function CatalogProductPage() {
   const { productId } = useParams();
   const { addItem, openCart } = useCart();
+  const [product, setProduct] = useState<CatalogProductView | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<CatalogProductView["id"]>>(
     new Set()
   );
 
-  const product = productId ? getCatalogProductById(productId) : null;
+  useEffect(() => {
+    if (!productId) {
+      setProduct(null);
+      setIsLoading(false);
+      return;
+    }
+
+    let ignore = false;
+
+    const loadProduct = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+
+      try {
+        const nextProduct = await fetchCatalogProductById(productId);
+        if (ignore) return;
+        setProduct(nextProduct);
+      } catch (error: any) {
+        if (ignore) return;
+
+        console.error("fetchCatalogProductById error:", error);
+        setProduct(null);
+
+        if (error?.response?.status !== 404) {
+          setLoadError("No pudimos cargar el detalle del producto.");
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadProduct();
+
+    return () => {
+      ignore = true;
+    };
+  }, [productId]);
 
   const toggleFavorite = (productKey: CatalogProductView["id"]) => {
     setFavorites((prev) => {
@@ -39,12 +81,45 @@ export default function CatalogProductPage() {
   };
 
   const addToCart = (selectedProduct: CatalogProductView, quantity = 1) => {
+    if (!selectedProduct.inStock) return;
+
     for (let index = 0; index < quantity; index += 1) {
       addItem(selectedProduct);
     }
 
     openCart();
   };
+
+  if (isLoading) {
+    return (
+      <main className={cx("detailPage")}>
+        <div className={cx("detailShell")}>
+          <section className={cx("detailNotFound")}>
+            <h1 className={cx("detailNotFoundTitle")}>Cargando producto</h1>
+            <p className={cx("detailNotFoundText")}>
+              Estamos trayendo la informacion del producto desde el backend.
+            </p>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <main className={cx("detailPage")}>
+        <div className={cx("detailShell")}>
+          <section className={cx("detailNotFound")}>
+            <h1 className={cx("detailNotFoundTitle")}>No pudimos cargar el producto</h1>
+            <p className={cx("detailNotFoundText")}>{loadError}</p>
+            <Link to="/catalogue" className={cx("detailBackButton")}>
+              Volver al catalogo
+            </Link>
+          </section>
+        </div>
+      </main>
+    );
+  }
 
   if (!product) {
     return (

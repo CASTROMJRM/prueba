@@ -8,9 +8,10 @@ import authRoutes from "./routes/authRoutes.js";
 import { sequelize } from "./config/sequelize.js";
 import userRoutes from "./routes/userRoutes.js";
 import devRoutes from "./routes/devroutes.js";
+import publicProductRoutes from "./routes/public/productRoutes.js";
 import brandRoutes from "./routes/admin/brandRoutes.js";
 import categoryRoutes from "./routes/admin/categoryRoutes.js";
-import productRoutes from "./routes/admin/productRoutes.js";
+import adminProductRoutes from "./routes/admin/productRoutes.js";
 import monitoringRoutes from "./routes/admin/monitoringRoutes.js";
 import backupRoutes from "./routes/admin/backupRoutes.js";
 import backupScheduleRoutes from "./routes/admin/backupScheduleRoutes.js";
@@ -37,13 +38,13 @@ sequelize
   })
   .catch((err) => console.error("❌ Error al conectar DB:", err));
 
-app.use("/api/products", productRoutes);
+app.use("/api/products", publicProductRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/dev", devRoutes);
 app.use("/api/admin/brands", brandRoutes);
 app.use("/api/admin/categories", categoryRoutes);
-app.use("/api/admin/products", productRoutes);
+app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin/monitoring", monitoringRoutes);
 app.use("/api/admin/backups", backupRoutes);
 app.use("/api/admin/backup-schedule", backupScheduleRoutes);

@@ -14,9 +14,12 @@ import {
 import styles from "./CatalogePage.module.css";
 import { useCart } from "../../context/CartContext";
 import {
-  getCatalogProducts,
-  type CatalogProductDTO,
-} from "../../services/catalogService";
+  buildCatalogCategories,
+  type CatalogProductView,
+  catalogSortOptions,
+  fetchCatalogProducts,
+  getCatalogProductPath,
+} from "./catalogData";
 
 const cx = (...names: Array<string | null | undefined | false>) =>
   names
@@ -25,100 +28,53 @@ const cx = (...names: Array<string | null | undefined | false>) =>
     .filter(Boolean)
     .join(" ");
 
-type CatalogProductView = {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  rating: number;
-  reviewCount: number;
-  featured: boolean;
-  badge?: string;
-  stock: number;
-};
-
-const catalogSortOptions = [
-  "RECOMENDADO",
-  "PRECIO: MENOR A MAYOR",
-  "PRECIO: MAYOR A MENOR",
-  "MAS POPULARES",
-  "MAS NUEVOS",
-];
-
-const getCatalogProductPath = (id: string) => `/catalogo/${id}`;
-
-const mapCatalogProductToView = (
-  product: CatalogProductDTO
-): CatalogProductView => ({
-  id: product.id,
-  name: product.name,
-  category: product.categoryName || product.productType || "General",
-  description:
-    product.description?.trim() || "Producto disponible en Titanium Shop.",
-  price: Number(product.price ?? 0),
-  originalPrice: undefined,
-  image:
-    product.imageUrl ||
-    product.images?.[0]?.url ||
-    "https://via.placeholder.com/600x600?text=Producto",
-  rating: 5,
-  reviewCount: 0,
-  featured: Number(product.stock ?? 0) > 0,
-  badge:
-    product.productType === "Suplementación"
-      ? "Suplemento"
-      : product.productType === "Ropa"
-        ? "Ropa"
-        : undefined,
-  stock: Number(product.stock ?? 0),
-});
-
 export default function CatalogoPage() {
   const { addItem, openCart } = useCart();
-
+  const [products, setProducts] = useState<CatalogProductView[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("TODOS");
   const [sortBy, setSortBy] = useState("RECOMENDADO");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<CatalogProductView["id"]>>(
     new Set()
   );
-  const [products, setProducts] = useState<CatalogProductView[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
   const productsPerPage = 8;
+  const catalogCategories = useMemo(
+    () => buildCatalogCategories(products),
+    [products]
+  );
 
   useEffect(() => {
+    let ignore = false;
+
     const loadProducts = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+
       try {
-        setLoading(true);
-        setError("");
-
-        const data = await getCatalogProducts();
-        const mappedProducts = data.map(mapCatalogProductToView);
-
-        setProducts(mappedProducts);
-      } catch (err) {
-        console.error("Error cargando catálogo:", err);
-        setError("No se pudieron cargar los productos.");
+        const nextProducts = await fetchCatalogProducts();
+        if (ignore) return;
+        setProducts(nextProducts);
+      } catch (error) {
+        if (ignore) return;
+        console.error("fetchCatalogProducts error:", error);
+        setProducts([]);
+        setLoadError("No pudimos cargar el catalogo desde el backend.");
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setIsLoading(false);
+        }
       }
     };
 
-    loadProducts();
-  }, []);
+    void loadProducts();
 
-  const catalogCategories = useMemo(() => {
-    const dynamicCategories = Array.from(
-      new Set(products.map((product) => product.category).filter(Boolean))
-    );
-    return ["TODOS", ...dynamicCategories];
-  }, [products]);
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -148,15 +104,33 @@ export default function CatalogoPage() {
         filtered.sort((a, b) => b.reviewCount - a.reviewCount);
         break;
       case "MAS NUEVOS":
-        filtered.reverse();
+        filtered.sort(
+          (a, b) =>
+            new Date(b.createdAt ?? 0).getTime() -
+            new Date(a.createdAt ?? 0).getTime()
+        );
         break;
       default:
-        filtered.sort((a, b) => Number(b.featured) - Number(a.featured));
+        filtered.sort((a, b) => {
+          if (Number(b.featured) !== Number(a.featured)) {
+            return Number(b.featured) - Number(a.featured);
+          }
+
+          return (
+            new Date(b.createdAt ?? 0).getTime() -
+            new Date(a.createdAt ?? 0).getTime()
+          );
+        });
         break;
     }
 
     return filtered;
   }, [products, searchQuery, selectedCategory, sortBy]);
+
+  useEffect(() => {
+    if (catalogCategories.includes(selectedCategory)) return;
+    setSelectedCategory("TODOS");
+  }, [catalogCategories, selectedCategory]);
 
   useEffect(() => {
     setCurrentPageNumber(1);
@@ -178,7 +152,8 @@ export default function CatalogoPage() {
         : "Todos los productos";
 
   const addToCart = (product: CatalogProductView) => {
-    addItem(product as never);
+    if (!product.inStock) return;
+    addItem(product);
     openCart();
   };
 
@@ -231,7 +206,7 @@ export default function CatalogoPage() {
                 <span>Productos</span>
               </div>
               <div className={cx("catalogStat")}>
-                <strong>{Math.max(catalogCategories.length - 1, 0)}</strong>
+                <strong>{catalogCategories.length - 1}</strong>
                 <span>Categorias</span>
               </div>
             </div>
@@ -322,17 +297,32 @@ export default function CatalogoPage() {
               </div>
             </div>
 
-            {loading ? (
+            {isLoading ? (
               <div className={cx("catalogEmptyState")}>
-                <h3 className={cx("catalogEmptyTitle")}>Cargando productos...</h3>
+                <span className={cx("catalogEmptyIcon")}>
+                  <FaSearch />
+                </span>
+                <h3 className={cx("catalogEmptyTitle")}>Cargando productos</h3>
                 <p className={cx("catalogEmptyText")}>
-                  Estamos obteniendo el catalogo desde el servidor.
+                  Estamos trayendo el catalogo desde la base de datos.
                 </p>
               </div>
-            ) : error ? (
+            ) : loadError ? (
               <div className={cx("catalogEmptyState")}>
-                <h3 className={cx("catalogEmptyTitle")}>Ocurrio un problema</h3>
-                <p className={cx("catalogEmptyText")}>{error}</p>
+                <span className={cx("catalogEmptyIcon")}>
+                  <FaTimes />
+                </span>
+                <h3 className={cx("catalogEmptyTitle")}>
+                  No pudimos cargar el catalogo
+                </h3>
+                <p className={cx("catalogEmptyText")}>{loadError}</p>
+                <button
+                  type="button"
+                  className={cx("catalogEmptyButton")}
+                  onClick={() => window.location.reload()}
+                >
+                  Intentar de nuevo
+                </button>
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className={cx("catalogEmptyState")}>
@@ -448,10 +438,10 @@ export default function CatalogoPage() {
                               type="button"
                               className={cx("catalogAddToCartButton")}
                               onClick={() => addToCart(product)}
-                              disabled={product.stock <= 0}
+                              disabled={!product.inStock}
                             >
                               <FaShoppingCart />
-                              {product.stock > 0 ? "Agregar al carrito" : "Sin stock"}
+                              {product.inStock ? "Agregar al carrito" : "Sin stock"}
                             </button>
                             <Link
                               to={getCatalogProductPath(product.id)}
