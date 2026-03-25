@@ -16,7 +16,9 @@ import monitoringRoutes from "./routes/admin/monitoringRoutes.js";
 import backupRoutes from "./routes/admin/backupRoutes.js";
 import backupScheduleRoutes from "./routes/admin/backupScheduleRoutes.js";
 import { initializeBackupScheduler } from "./services/backupScheduler.js";
-
+import publicCatalogRoutes from "./routes/public/catalog.routes.js";
+import adminAboutRoutes from "./routes/admin/about.routes.js";
+import publicAboutRoutes from "./routes/public/about.routes.js";
 dotenv.config();
 const app = express();
 
@@ -47,6 +49,8 @@ app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin/monitoring", monitoringRoutes);
 app.use("/api/admin/backups", backupRoutes);
 app.use("/api/admin/backup-schedule", backupScheduleRoutes);
-
+app.use("/api/catalog", publicCatalogRoutes);
+app.use("/api/admin/about", adminAboutRoutes);
+app.use("/api/about", publicAboutRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));

@@ -1,13 +1,14 @@
-import styles from "./ClientPages.module.css";
+import ProfilePredictionPanel from "../../components/layout/client/ProfilePredictionPanel/ProfilePredictionPanel";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ClientProfilePage() {
+  const { user } = useAuth();
+  const storageScope = user?.id || user?.email || "cliente";
+
   return (
-    <section className={styles.page}>
-      <h2>Mi perfil</h2>
-      <p>
-        Desde aquí podrás actualizar tus datos personales y contacto de
-        emergencia.
-      </p>
-    </section>
+    <ProfilePredictionPanel
+      storageScope={storageScope}
+      displayName={user?.email?.split("@")[0]}
+    />
   );
 }
