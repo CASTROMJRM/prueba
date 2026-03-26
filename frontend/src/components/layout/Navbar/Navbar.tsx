@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import headerStyles from "../Header/Header.module.css";
-import Logo from "../../../assets/LogoP.png";
+import Logo from "../../../assets/logo_ULTRA_HD-removebg-preview.png";
 
 import {
   FaHome,

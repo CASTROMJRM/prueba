@@ -4,6 +4,7 @@ import styles from "../Navbar/Navbar.module.css";
 import headerStyles from "./Header.module.css";
 
 import Logo from "../../../assets/LogoP.png";
+import LogoWhite from "../../../assets/LogoP-removebg-preview.png";
 import MobileMenu from "../MobileMenu";
 
 import {
@@ -105,7 +106,7 @@ export default function Header() {
           >
             <Link to="/" className={styles.logoLink}>
               <img
-                src={Logo}
+                src={isTransparentHomeHeader ? LogoWhite : Logo}
                 alt="Titanium Sport Gym"
                 className={styles.logoImage}
               />

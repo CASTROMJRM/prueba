@@ -45,10 +45,10 @@
 }
 
 .logoContainerFloating {
-  padding: 0.5rem 0.95rem;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.12);
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: brightness(0) invert(1);
 }
 
 .logoImage {
@@ -101,7 +101,10 @@
   background: transparent;
   color: var(--text, #1a1a1a);
   cursor: pointer;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
 }
 
 .cartButton:hover {
@@ -194,6 +197,10 @@
 .headerTransparent .navLink {
   color: #ffffff;
   text-shadow: 0 3px 16px rgba(0, 0, 0, 0.32);
+}
+
+.headerTransparent .logoImage {
+  filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.28));
 }
 
 .headerTransparent .navLink:hover {
