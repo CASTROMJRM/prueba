@@ -11,7 +11,6 @@ import {
 export const getMyProfileDashboard = async (req, res) => {
   try {
     const userId = req.user.id;
-    const today = getTodayDateOnly();
 
     const profile = await UserProfile.findOne({
       where: { userId },
@@ -37,12 +36,10 @@ export const getMyProfileDashboard = async (req, res) => {
       latestCalories,
       weightHistory,
       calorieHistory,
-      canRegisterWeight:
-        !latestWeight || today >= latestWeight.nextAllowedDate,
-      nextWeightAllowedDate: latestWeight?.nextAllowedDate ?? null,
-      canRegisterCalories:
-        !latestCalories || today >= latestCalories.nextAllowedDate,
-      nextCaloriesAllowedDate: latestCalories?.nextAllowedDate ?? null,
+      canRegisterWeight: true,
+      nextWeightAllowedDate: null,
+      canRegisterCalories: true,
+      nextCaloriesAllowedDate: null,
     });
   } catch (error) {
     console.error("getMyProfileDashboard error:", error);
@@ -117,7 +114,6 @@ export const upsertMyProfile = async (req, res) => {
 export const getMyWeightHistory = async (req, res) => {
   try {
     const userId = req.user.id;
-    const today = getTodayDateOnly();
 
     const records = await UserWeightHistory.findAll({
       where: { userId },
@@ -130,8 +126,8 @@ export const getMyWeightHistory = async (req, res) => {
       ok: true,
       records,
       latestRecord,
-      canRegister: !latestRecord || today >= latestRecord.nextAllowedDate,
-      nextAllowedDate: latestRecord?.nextAllowedDate ?? null,
+      canRegister: true,
+      nextAllowedDate: null,
     });
   } catch (error) {
     console.error("getMyWeightHistory error:", error);
@@ -147,7 +143,7 @@ export const createWeeklyWeightRecord = async (req, res) => {
     const userId = req.user.id;
     const { weight } = req.body;
 
-    if (!weight) {
+    if (!weight || Number(weight) <= 0) {
       return res.status(400).json({
         ok: false,
         message: "El peso es requerido.",
@@ -155,18 +151,6 @@ export const createWeeklyWeightRecord = async (req, res) => {
     }
 
     const today = getTodayDateOnly();
-
-    const lastRecord = await UserWeightHistory.findOne({
-      where: { userId },
-      order: [["recordDate", "DESC"]],
-    });
-
-    if (lastRecord && today < lastRecord.nextAllowedDate) {
-      return res.status(403).json({
-        ok: false,
-        message: `Ya registraste tu peso. Podrás volver a registrarlo a partir del ${lastRecord.nextAllowedDate}.`,
-      });
-    }
 
     const nextAllowedDate = addDaysToDateOnly(today, 7);
 
@@ -237,7 +221,6 @@ export const deleteLatestWeightRecord = async (req, res) => {
 export const getMyCalorieHistory = async (req, res) => {
   try {
     const userId = req.user.id;
-    const today = getTodayDateOnly();
 
     const records = await UserCalorieHistory.findAll({
       where: { userId },
@@ -250,8 +233,8 @@ export const getMyCalorieHistory = async (req, res) => {
       ok: true,
       records,
       latestRecord,
-      canRegister: !latestRecord || today >= latestRecord.nextAllowedDate,
-      nextAllowedDate: latestRecord?.nextAllowedDate ?? null,
+      canRegister: true,
+      nextAllowedDate: null,
     });
   } catch (error) {
     console.error("getMyCalorieHistory error:", error);
@@ -262,7 +245,7 @@ export const getMyCalorieHistory = async (req, res) => {
   }
 };
 
-export const createWeeklyCalorieRecord = async (req, res) => {
+export const createDailyCalorieRecord = async (req, res) => {
   try {
     const userId = req.user.id;
     const { dailyCalories } = req.body;
@@ -270,43 +253,73 @@ export const createWeeklyCalorieRecord = async (req, res) => {
     if (!dailyCalories) {
       return res.status(400).json({
         ok: false,
-        message: "La ingesta calórica diaria es requerida.",
+        message: "La ingesta calorica diaria es requerida.",
       });
     }
 
     const today = getTodayDateOnly();
 
-    const lastRecord = await UserCalorieHistory.findOne({
-      where: { userId },
-      order: [["recordDate", "DESC"]],
-    });
-
-    if (lastRecord && today < lastRecord.nextAllowedDate) {
-      return res.status(403).json({
-        ok: false,
-        message: `Ya registraste tus calorías. Podrás volver a registrarlas a partir del ${lastRecord.nextAllowedDate}.`,
-      });
-    }
-
-    const nextAllowedDate = addDaysToDateOnly(today, 7);
+    const nextRecordDate = addDaysToDateOnly(today, 1);
 
     const record = await UserCalorieHistory.create({
       userId,
       recordDate: today,
       dailyCalories,
-      nextAllowedDate,
+      nextAllowedDate: nextRecordDate,
     });
 
     return res.status(201).json({
       ok: true,
-      message: "Calorías registradas correctamente.",
+      message: "Calorias diarias registradas correctamente.",
       record,
     });
   } catch (error) {
-    console.error("createWeeklyCalorieRecord error:", error);
+    console.error("createDailyCalorieRecord error:", error);
     return res.status(500).json({
       ok: false,
-      message: "Error al registrar calorías.",
+      message: "Error al registrar calorias.",
+    });
+  }
+};
+
+export const updateWeightRecord = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { weight } = req.body;
+
+    if (!weight || Number(weight) <= 0) {
+      return res.status(400).json({
+        ok: false,
+        message: "Ingresa un peso valido para actualizar.",
+      });
+    }
+
+    const record = await UserWeightHistory.findOne({
+      where: { id, userId },
+    });
+
+    if (!record) {
+      return res.status(404).json({
+        ok: false,
+        message: "Registro de peso no encontrado.",
+      });
+    }
+
+    await record.update({
+      weight,
+    });
+
+    return res.status(200).json({
+      ok: true,
+      message: "Registro de peso actualizado correctamente.",
+      record,
+    });
+  } catch (error) {
+    console.error("updateWeightRecord error:", error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error al actualizar el registro de peso.",
     });
   }
 };

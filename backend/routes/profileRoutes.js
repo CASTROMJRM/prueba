@@ -4,9 +4,10 @@ import {
   upsertMyProfile,
   getMyWeightHistory,
   createWeeklyWeightRecord,
+  updateWeightRecord,
   deleteLatestWeightRecord,
   getMyCalorieHistory,
-  createWeeklyCalorieRecord,
+  createDailyCalorieRecord,
 } from "../controllers/profileController.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 
@@ -17,9 +18,10 @@ router.put("/me", requireAuth, upsertMyProfile);
 
 router.get("/me/weights", requireAuth, getMyWeightHistory);
 router.post("/me/weights", requireAuth, createWeeklyWeightRecord);
+router.put("/me/weights/:id", requireAuth, updateWeightRecord);
 router.delete("/me/weights/:id", requireAuth, deleteLatestWeightRecord);
 
 router.get("/me/calories", requireAuth, getMyCalorieHistory);
-router.post("/me/calories", requireAuth, createWeeklyCalorieRecord);
+router.post("/me/calories", requireAuth, createDailyCalorieRecord);
 
 export default router;

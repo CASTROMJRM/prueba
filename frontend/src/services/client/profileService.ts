@@ -76,6 +76,10 @@ export type CreateWeightPayload = {
   weight: number;
 };
 
+export type UpdateWeightPayload = {
+  weight: number;
+};
+
 export type CreateCaloriePayload = {
   dailyCalories: number;
 };
@@ -171,6 +175,14 @@ export async function createWeeklyWeight(payload: CreateWeightPayload) {
   return data;
 }
 
+export async function updateWeightRecord(
+  recordId: string,
+  payload: UpdateWeightPayload
+) {
+  const { data } = await API.put(`/profile/me/weights/${recordId}`, payload);
+  return data;
+}
+
 export async function deleteLatestWeight(recordId: string) {
   const { data } = await API.delete(`/profile/me/weights/${recordId}`);
   return data;
@@ -192,7 +204,9 @@ export async function getMyCalorieHistory() {
   };
 }
 
-export async function createWeeklyCalories(payload: CreateCaloriePayload) {
+export async function createDailyCalories(payload: CreateCaloriePayload) {
   const { data } = await API.post("/profile/me/calories", payload);
   return data;
 }
+
+export const createWeeklyCalories = createDailyCalories;
