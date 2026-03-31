@@ -20,6 +20,7 @@ import {
 
 import { useAuth } from "../../../context/AuthContext";
 import { getPortalRoute, normalizeAppRole } from "../../../utils/authRouting";
+
 interface Props {
   scrolled: boolean;
   onToggleMobile: () => void;
@@ -41,7 +42,7 @@ const sharedNavItems: NavItem[] = [
 
 const Navbar = ({ scrolled, onToggleMobile }: Props) => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, requestLogout } = useAuth();
   const role = normalizeAppRole(user?.rol);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -163,8 +164,8 @@ const Navbar = ({ scrolled, onToggleMobile }: Props) => {
                       className={headerStyles.dropdownItemDanger}
                       type="button"
                       onClick={() => {
-                        logout();
-                        navigate("/login");
+                        setUserMenuOpen(false);
+                        void requestLogout();
                       }}
                     >
                       <FaSignOutAlt /> Cerrar sesion

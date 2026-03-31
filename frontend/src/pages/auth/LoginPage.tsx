@@ -149,7 +149,9 @@ export default function LoginPage() {
       localStorage.removeItem(LOGIN_LOCK_KEY);
 
       setUser(userData);
-      navigate(getDefaultAuthenticatedRoute(userData.rol));
+      navigate(getDefaultAuthenticatedRoute(userData.rol), {
+        state: { showLoginSuccess: true },
+      });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 429) {
         const seconds = error.response?.data?.retryAfterSeconds ?? 60;

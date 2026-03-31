@@ -1,9 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import {
-  FaBars,
-  FaHome,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import { FaBars, FaHome, FaSignOutAlt } from "react-icons/fa";
 import Logo from "../../../../assets/LogoP.png";
 import { useAuth } from "../../../../context/AuthContext";
 import styles from "./ClientTopbar.module.css";
@@ -22,7 +18,7 @@ export default function ClientTopbar({
   onToggleSidebar,
 }: ClientTopbarProps) {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, requestLogout } = useAuth();
 
   return (
     <header className={styles.topbar}>
@@ -75,9 +71,7 @@ export default function ClientTopbar({
         <button
           type="button"
           className={styles.iconBtn}
-          onClick={() => {
-            logout();
-          }}
+          onClick={() => void requestLogout()}
           aria-label="Cerrar sesion"
           title="Cerrar sesion"
         >

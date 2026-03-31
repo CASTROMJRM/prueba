@@ -12,7 +12,7 @@ interface Props {
 
 const MobileMenu = ({ onClose }: Props) => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, requestLogout } = useAuth();
   const { itemCount, openCart } = useCart();
   const role = normalizeAppRole(user?.rol);
 
@@ -113,8 +113,8 @@ const MobileMenu = ({ onClose }: Props) => {
                 type="button"
                 className={`${navStyles.btnSolid} ${menuStyles.actionButton}`}
                 onClick={() => {
-                  logout();
                   onClose();
+                  void requestLogout();
                 }}
               >
                 CERRAR SESION

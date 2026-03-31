@@ -7,7 +7,6 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import Logo from "../../../../assets/LogoP.png";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthContext";
 
 interface Props {
@@ -21,8 +20,7 @@ export default function AdminTopbar({
   title = "HOME",
   breadcrumb = "DASHBOARD",
 }: Props) {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, requestLogout } = useAuth();
 
   return (
     <header className={styles.topbar}>
@@ -31,7 +29,7 @@ export default function AdminTopbar({
           type="button"
           className={styles.menuBtn}
           onClick={onToggleSidebar}
-          aria-label="Abrir o cerrar menú lateral"
+          aria-label="Abrir o cerrar menu lateral"
         >
           <FaBars />
         </button>
@@ -75,16 +73,12 @@ export default function AdminTopbar({
           </div>
         </div>
 
-        {/*LOGOUT */}
         <button
           className={styles.iconBtn}
-          aria-label="Cerrar sesión"
+          aria-label="Cerrar sesion"
           type="button"
-          onClick={() => {
-            logout();
-            navigate("/login");
-          }}
-          title="Cerrar sesión"
+          onClick={() => void requestLogout()}
+          title="Cerrar sesion"
         >
           <FaSignOutAlt />
         </button>

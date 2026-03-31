@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext, type User } from "./AuthContext";
+import { showAlert, showLogoutConfirmAlert } from "../utils/feedback";
 
 const INACTIVITY_LIMIT_MS = 15 * 60_000; // 15 minutos
 
@@ -35,15 +36,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     navigate("/login", { replace: true });
   }, [clearInactivityTimer, navigate]);
 
+  const requestLogout = useCallback(async () => {
+    const result = await showLogoutConfirmAlert();
+
+    if (!result.isConfirmed) {
+      return false;
+    }
+
+    logout();
+    return true;
+  }, [logout]);
+
   const startInactivityTimer = useCallback(() => {
     clearInactivityTimer();
     inactivityTimerRef.current = window.setTimeout(() => {
-      alert("Por seguridad, tu sesión se cerró por inactividad.");
+      void showAlert({
+        title: "Sesion cerrada por inactividad",
+        text: "Por seguridad, tu sesion se cerro automaticamente.",
+        icon: "warning",
+      });
       logout();
     }, INACTIVITY_LIMIT_MS);
   }, [clearInactivityTimer, logout]);
 
-  // cargar sesión al iniciar
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -57,7 +72,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  // timer de inactividad
   useEffect(() => {
     if (!user) {
       clearInactivityTimer();
@@ -67,12 +81,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     startInactivityTimer();
 
     const resetTimer = () => startInactivityTimer();
-    const events = ["click", "mousemove", "keydown", "scroll", "touchstart"] as const;
+    const events = [
+      "click",
+      "mousemove",
+      "keydown",
+      "scroll",
+      "touchstart",
+    ] as const;
 
-    events.forEach((eventName) => window.addEventListener(eventName, resetTimer));
+    events.forEach((eventName) =>
+      window.addEventListener(eventName, resetTimer),
+    );
 
     return () => {
-      events.forEach((eventName) => window.removeEventListener(eventName, resetTimer));
+      events.forEach((eventName) =>
+        window.removeEventListener(eventName, resetTimer),
+      );
       clearInactivityTimer();
     };
   }, [user, startInactivityTimer, clearInactivityTimer]);
@@ -80,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (isLoading) return null;
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
+    <AuthContext.Provider value={{ user, setUser, logout, requestLogout }}>
       {children}
     </AuthContext.Provider>
   );

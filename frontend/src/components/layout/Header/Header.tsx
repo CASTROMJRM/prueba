@@ -44,7 +44,7 @@ const sharedNavItems: NavItem[] = [
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, requestLogout } = useAuth();
   const { itemCount, openCart } = useCart();
   const role = normalizeAppRole(user?.rol);
 
@@ -218,8 +218,8 @@ export default function Header() {
                         className={headerStyles.dropdownItemDanger}
                         type="button"
                         onClick={() => {
-                          logout();
-                          navigate("/login");
+                          setUserMenuOpen(false);
+                          void requestLogout();
                         }}
                       >
                         <FaSignOutAlt /> Cerrar sesion
