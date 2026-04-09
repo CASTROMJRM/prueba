@@ -7,6 +7,7 @@ export function showSuccessToast(message: string, description?: string) {
 
 const roleLabels: Record<string, string> = {
   administrador: "Panel administrativo",
+  entrenador: "Portal de entrenador",
   cliente: "Portal de cliente",
 };
 

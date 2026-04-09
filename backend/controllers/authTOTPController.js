@@ -102,6 +102,7 @@ export const verifyTOTP = async (req, res) => {
         id: user.id,
         email: user.email,
         rol: user.role,
+        mustChangePassword: user.mustChangePassword,
       },
     });
   } catch (err) {

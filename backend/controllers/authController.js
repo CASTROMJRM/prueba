@@ -9,6 +9,7 @@
   import dotenv from 'dotenv';
   import { blacklistToken } from "../middleware/tokenBlacklist.js";
   import { Session } from "../models/Session.js";
+  import { generateRandomPassword } from "../utils/passwordPolicy.js";
   const failedAttempts = new Map(); // email => { count, lastAttempt }
   dotenv.config();
   /* ================================
@@ -49,6 +50,47 @@
     } catch (err) {
       console.error("❌ Error en registro:", err);
       res.status(400).json({ error: "Error al registrar usuario" });
+    }
+  };
+
+  /* ================================
+    🟢 REGISTRO DE ENTRENADOR POR ADMIN
+  ================================= */
+  export const adminRegisterTrainer = async (req, res) => {
+    const normalizedEmail = String(req.body?.email ?? "").trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      return res.status(400).json({ error: "El correo es obligatorio" });
+    }
+
+    try {
+      // Verificar si ya existe
+      const existing = await User.findOne({ where: { email: normalizedEmail } });
+      if (existing) {
+        return res.status(400).json({ error: "El correo ya está registrado" });
+      }
+
+      // Generar contraseña aleatoria
+      const randomPassword = generateRandomPassword();
+      const hashed = await bcrypt.hash(randomPassword, 10);
+
+      // Crear usuario entrenador
+      const user = await User.create({
+        email: normalizedEmail,
+        password: hashed,
+        role: "entrenador",
+        isVerified: true, // No necesita verificación
+        mustChangePassword: true, // Debe cambiar contraseña en primer login
+      });
+
+      res.status(201).json({
+        message: "Entrenador registrado exitosamente",
+        email: user.email,
+        generatedPassword: randomPassword, // Devolver la contraseña generada para que el admin la proporcione al entrenador
+      });
+    } catch (err) {
+      console.error("❌ Error en registro de entrenador:", err);
+      res.status(400).json({ error: "Error al registrar entrenador" });
     }
   };
 
@@ -221,6 +263,7 @@ export const login = async (req, res) => {
             id: user.id,
             email: user.email,
             rol: user.role, // 👈 usa 'rol' para que tu front siga funcionando
+            mustChangePassword: user.mustChangePassword,
           },
           twoFactorRequired: false,
         });
@@ -309,6 +352,7 @@ export const verifyOTP = async (req, res) => {
         id: user.id,
         email: user.email,
         rol: user.role,
+        mustChangePassword: user.mustChangePassword,
       },
     });
   } catch (err) {
@@ -434,8 +478,46 @@ export const resetPassword = async (req, res) => {
 };
 
 
-export const confirmAccess = async (req, res) => {
+export const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const user = req.user;
+
+    // Si no debe cambiar contraseña, verificar oldPassword
+    if (!user.mustChangePassword) {
+      if (!oldPassword) {
+        return res.status(400).json({ error: "Contraseña actual requerida" });
+      }
+      const match = await bcrypt.compare(oldPassword, user.password);
+      if (!match) {
+        return res.status(400).json({ error: "Contraseña actual incorrecta" });
+      }
+    }
+
+    // Validar nueva contraseña
+    const { isStrongPassword } = await import("../utils/passwordPolicy.js");
+    if (!isStrongPassword(newPassword)) {
+      return res.status(400).json({ error: "La nueva contraseña no cumple con los requisitos de seguridad" });
+    }
+
+    // Hashear nueva contraseña
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    user.mustChangePassword = false; // Ya cambió
+    user.passwordChangesCount += 1;
+    user.passwordChangesDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    await user.save();
+
+    res.status(200).json({ message: "Contraseña cambiada exitosamente" });
+  } catch (err) {
+    console.error("❌ Error al cambiar contraseña:", err);
+    res.status(500).json({ error: "Error al cambiar contraseña" });
+  }
+};
   // 🔍 Aceptamos el token de varias formas
+export const confirmAccess = async (req, res) => {
   const token =
     req.body.token ||
     req.body.accessToken ||
@@ -492,8 +574,12 @@ export const confirmAccess = async (req, res) => {
     return res.status(200).json({
       message: "Acceso confirmado",
       token: finalToken,
-      email: user.email,
-      role: user.role,
+      user: {
+        id: user.id,
+        email: user.email,
+        rol: user.role,
+        mustChangePassword: user.mustChangePassword,
+      },
     });
   } catch (err) {
     console.error(
