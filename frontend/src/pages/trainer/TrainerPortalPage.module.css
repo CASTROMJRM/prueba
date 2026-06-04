@@ -187,3 +187,252 @@
     padding: 20px;
   }
 }
+.sectionTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.toolbar {
+  margin: 20px 0;
+}
+
+.toolbar input,
+.portalForm input,
+.portalForm select,
+.portalForm textarea {
+  width: 100%;
+  border: 1px solid rgba(17, 17, 22, 0.12);
+  border-radius: 16px;
+  padding: 13px 14px;
+  font: inherit;
+  background: #fbfbfd;
+  color: #24212b;
+  outline: none;
+}
+
+.portalForm {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.portalForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.portalForm label span {
+  font-weight: 800;
+  color: #302d39;
+}
+
+.formGridTwo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: #ec5dbb;
+  color: #ffffff;
+}
+
+.secondaryButton {
+  background: #f3f2f7;
+  color: #292631;
+}
+
+.dangerButton {
+  background: #ffe6e6;
+  color: #b42318;
+}
+
+.errorBox,
+.successBox {
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-weight: 800;
+  margin: 16px 0;
+}
+
+.errorBox {
+  color: #b42318;
+  background: #fff0f0;
+  border: 1px solid #ffd1d1;
+}
+
+.successBox {
+  color: #027a48;
+  background: #ecfdf3;
+  border: 1px solid #abefc6;
+}
+
+.emptyTableWrap {
+  margin-top: 24px;
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(17, 17, 22, 0.08);
+  background: #ffffff;
+}
+
+.simpleTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.simpleTable th {
+  text-align: left;
+  padding: 16px;
+  background: #f8f8fb;
+  color: #272331;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.simpleTable td {
+  padding: 18px 16px;
+  border-top: 1px solid rgba(17, 17, 22, 0.08);
+  color: #4b4658;
+}
+
+.emptyCell {
+  text-align: center;
+  color: #7c778a;
+  font-weight: 700;
+  padding: 36px 16px !important;
+}
+
+.emptySchedule {
+  margin-top: 24px;
+  padding: 42px 24px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #fafafa, #fff5fb);
+  border: 1px dashed rgba(236, 93, 187, 0.35);
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  font-size: 1.8rem;
+}
+
+.agendaList {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.agendaCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(17, 17, 22, 0.08);
+}
+
+.agendaCard strong {
+  color: #17131f;
+}
+
+.agendaCard p {
+  margin: 6px 0;
+  color: #686273;
+}
+
+.agendaCard small {
+  color: #ec5dbb;
+  font-weight: 800;
+}
+
+.profileCard {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(17, 17, 22, 0.08);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.06);
+}
+
+.avatarCircle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #111116;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 900;
+  overflow: hidden;
+}
+
+.avatarCircle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profileInfo span {
+  color: #7c778a;
+  font-size: 0.88rem;
+}
+
+.profileInfo strong {
+  color: #17131f;
+  font-size: 1.05rem;
+}
+
+.profileInfo p {
+  margin: 0;
+  color: #ec5dbb;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .sectionTop,
+  .agendaCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .formGridTwo {
+    grid-template-columns: 1fr;
+  }
+}
