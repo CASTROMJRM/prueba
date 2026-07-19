@@ -61,6 +61,121 @@ const FALLBACK_IMAGE =
   "https://via.placeholder.com/1200x1200/f4f4f5/18181b?text=Titanium";
 const NEW_PRODUCT_WINDOW_DAYS = 45;
 
+const FRONTEND_DEMO_PRODUCTS: CatalogProductApi[] = [
+  {
+    id: "demo-proteina-whey",
+    name: "Proteina Whey Titanium",
+    price: 699,
+    stock: 18,
+    status: "Activo",
+    imageUrl:
+      "https://via.placeholder.com/1200x1200/f8f5f2/1f1f24?text=Proteina+Whey",
+    description:
+      "Proteina en polvo para apoyar objetivos de ganancia muscular y recuperacion.",
+    features: [
+      "Alta en proteina",
+      "Ideal para despues de entrenar",
+      "Producto demo frontend",
+    ],
+    productType: "Suplemento",
+    supplementPresentation: "2 lb",
+    supplementFlavor: "Chocolate",
+    supplementServings: "30 porciones",
+    categoryName: "SUPLEMENTOS",
+    brandName: "Titanium",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "demo-creatina",
+    name: "Creatina Monohidratada",
+    price: 399,
+    stock: 22,
+    status: "Activo",
+    imageUrl:
+      "https://via.placeholder.com/1200x1200/f8f5f2/1f1f24?text=Creatina",
+    description:
+      "Suplemento comun para rutinas de fuerza, potencia y volumen muscular.",
+    features: [
+      "Creatina monohidratada",
+      "Sin sabor",
+      "Producto demo frontend",
+    ],
+    productType: "Suplemento",
+    supplementPresentation: "300 g",
+    supplementServings: "60 porciones",
+    categoryName: "SUPLEMENTOS",
+    brandName: "Titanium",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "demo-pre-entreno",
+    name: "Pre-entreno Explosive",
+    price: 459,
+    stock: 14,
+    status: "Activo",
+    imageUrl:
+      "https://via.placeholder.com/1200x1200/c91624/ffffff?text=Pre+Entreno",
+    description:
+      "Formula demo para representar productos usados antes de entrenamientos intensos.",
+    features: [
+      "Energia para entrenar",
+      "Sabor frutos rojos",
+      "Producto demo frontend",
+    ],
+    productType: "Suplemento",
+    supplementPresentation: "250 g",
+    supplementFlavor: "Frutos rojos",
+    categoryName: "SUPLEMENTOS",
+    brandName: "Titanium",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "demo-guantes",
+    name: "Guantes de Gimnasio",
+    price: 259,
+    stock: 16,
+    status: "Activo",
+    imageUrl:
+      "https://via.placeholder.com/1200x1200/1f1f24/d8ad4f?text=Guantes",
+    description:
+      "Accesorio demo para entrenamientos de fuerza y levantamiento.",
+    features: [
+      "Agarre comodo",
+      "Material resistente",
+      "Producto demo frontend",
+    ],
+    productType: "Accesorio",
+    apparelSize: "Unitalla",
+    apparelColor: "Negro",
+    categoryName: "ACCESORIOS",
+    brandName: "Titanium",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "demo-playera",
+    name: "Playera Training Titanium",
+    price: 329,
+    stock: 20,
+    status: "Activo",
+    imageUrl:
+      "https://via.placeholder.com/1200x1200/f8f5f2/1f1f24?text=Playera",
+    description:
+      "Prenda demo para visualizar compras de ropa fitness dentro del carrito.",
+    features: [
+      "Tela ligera",
+      "Uso deportivo",
+      "Producto demo frontend",
+    ],
+    productType: "Ropa",
+    apparelSize: "M",
+    apparelColor: "Negro",
+    apparelMaterial: "Poliester",
+    categoryName: "ROPA",
+    brandName: "Titanium",
+    createdAt: new Date().toISOString(),
+  },
+];
+
 export const catalogSortOptions = [
   "RECOMENDADO",
   "PRECIO: MENOR A MAYOR",
@@ -230,13 +345,31 @@ export function mapCatalogProduct(product: CatalogProductApi): CatalogProductVie
 }
 
 export async function fetchCatalogProducts() {
-  const { data } = await API.get<CatalogProductApi[]>("/products");
-  return Array.isArray(data) ? data.map(mapCatalogProduct) : [];
+  try {
+    const { data } = await API.get<CatalogProductApi[]>("/products");
+    return Array.isArray(data) ? data.map(mapCatalogProduct) : [];
+  } catch (error) {
+    console.warn("Usando catalogo demo frontend:", error);
+    return FRONTEND_DEMO_PRODUCTS.map(mapCatalogProduct);
+  }
 }
 
 export async function fetchCatalogProductById(productId: string | number) {
-  const { data } = await API.get<CatalogProductApi>(`/products/${productId}`);
-  return mapCatalogProduct(data);
+  try {
+    const { data } = await API.get<CatalogProductApi>(`/products/${productId}`);
+    return mapCatalogProduct(data);
+  } catch (error) {
+    const demoProduct = FRONTEND_DEMO_PRODUCTS.find(
+      (product) => String(product.id) === String(productId),
+    );
+
+    if (demoProduct) {
+      console.warn("Usando detalle demo frontend:", error);
+      return mapCatalogProduct(demoProduct);
+    }
+
+    throw error;
+  }
 }
 
 export function buildCatalogCategories(products: CatalogProductView[]) {

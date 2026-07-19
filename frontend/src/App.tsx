@@ -41,6 +41,8 @@ import AdminSummaryPage from "./pages/admin/AdminSummaryPage";
 import AdminAboutPage from "./pages/admin/AdminAboutPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminRoutinesPage from "./pages/admin/AdminRoutinesPage";
+import AdminSalesPredictionPage from "./pages/admin/AdminSalesPredictionPage";
+import AdminClientRenewalPredictionPage from "./pages/admin/AdminClientRenewalPredictionPage";
 // Client Portal
 import ClientInvitationsPage from "./pages/client/ClientInvitationsPage";
 import ClientPortalLayout from "./components/layout/client/ClientPortalLayout/ClientPortalLayout";
@@ -108,6 +110,7 @@ export default function App() {
           <Route index element={<AdminSummaryPage />} />
           <Route path="monitoring" element={<AdminDashboardPage />} />
           <Route path="products" element={<AdminProductsPage />} />
+          <Route path="sales-prediction" element={<AdminSalesPredictionPage />} />
           <Route path="suscripciones" element={<AdminSuscripcionesPage />} />
           <Route path="settings" element={<AdminSiteSettingsPage />} />
           <Route path="backups" element={<AdminBackupsPage />} />
@@ -115,6 +118,10 @@ export default function App() {
           <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="about" element={<AdminAboutPage />} />
           <Route path="users" element={<AdminUsersPage />} />
+          <Route
+            path="client-renewal-prediction"
+            element={<AdminClientRenewalPredictionPage />}
+          />
           <Route path="/admin/routines" element={<AdminRoutinesPage />} />
         </Route>
       </Route>

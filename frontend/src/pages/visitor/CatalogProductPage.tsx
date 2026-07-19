@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { FaChevronRight, FaHome } from "react-icons/fa";
 import CatalogProductDetail from "../../components/catalog/CatalogProductDetail";
-import { useCart } from "../../context/CartContext";
+import { useCart, type CartProduct } from "../../context/CartContext";
 import {
   fetchCatalogProductById,
   getCatalogProductPath,
@@ -92,6 +92,11 @@ export default function CatalogProductPage() {
     openCart();
   };
 
+  const addRecommendationToCart = (selectedProduct: CartProduct) => {
+    addItem(selectedProduct);
+    openCart();
+  };
+
   if (isLoading) {
     return (
       <main className={cx("detailPage")}>
@@ -165,6 +170,7 @@ export default function CatalogProductPage() {
           isFavorite={favorites.has(product.id)}
           onToggleFavorite={toggleFavorite}
           onAddToCart={addToCart}
+          onAddRecommendation={addRecommendationToCart}
         />
 
         <section className={cx("detailFooterNav")}>

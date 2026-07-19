@@ -1,9 +1,11 @@
 .pageShell {
   width: 100%;
+  max-width: 1720px;
   min-height: 100%;
   display: flex;
   flex-direction: column;
   gap: 22px;
+  margin: 0 auto;
   padding: 28px;
   color: #111827;
 }
@@ -44,9 +46,9 @@
 
 .heroTitle {
   margin: 8px 0 10px;
-  font-size: clamp(30px, 4vw, 42px);
+  font-size: 42px;
   line-height: 1.04;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 
 .heroText {
@@ -203,6 +205,203 @@
   color: #6b7280;
   font-size: 14px;
   line-height: 1.6;
+}
+
+.workflowPanel,
+.catalogPanel,
+.pendingPanel,
+.sectionBlock {
+  position: relative;
+}
+
+.sectionBlock {
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.05);
+}
+
+.workflowGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.workflowCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: #f9fafb;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.workflowNumber {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.workflowCard strong {
+  display: block;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.workflowCard p {
+  margin: 5px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sectionHelp,
+.formNotice,
+.warningNote,
+.readyNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.sectionHelp,
+.formNotice {
+  margin-bottom: 18px;
+  background: rgba(219, 36, 28, 0.06);
+  border: 1px solid rgba(219, 36, 28, 0.12);
+  color: #7f1d1d;
+}
+
+.sectionHelp svg,
+.formNotice svg {
+  margin-top: 2px;
+  color: #b91c1c;
+  flex-shrink: 0;
+}
+
+.registrationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.formCard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.formSection {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.formSection h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.planSummary {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #111827;
+  color: #ffffff;
+}
+
+.planSummary span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.planSummary strong {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.planSummary p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.fullAction {
+  width: 100%;
+}
+
+.pendingCard {
+  padding: 20px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.pendingHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.groupMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.warningNote {
+  margin-top: 14px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #92400e;
+}
+
+.readyNote {
+  margin-top: 14px;
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.18);
+  color: #166534;
 }
 
 .searchBox {
@@ -385,7 +584,8 @@
   gap: 14px;
 }
 
-.formStack label {
+.formStack label,
+.formGrid label {
   display: grid;
   gap: 8px;
   color: #374151;
@@ -395,7 +595,10 @@
 
 .formStack input,
 .formStack select,
-.formStack textarea {
+.formStack textarea,
+.formGrid input,
+.formGrid select,
+.formGrid textarea {
   width: 100%;
   min-height: 44px;
   padding: 0 14px;
@@ -407,7 +610,8 @@
   font: inherit;
 }
 
-.formStack textarea {
+.formStack textarea,
+.formGrid textarea {
   min-height: 96px;
   padding-top: 12px;
   resize: vertical;
@@ -415,9 +619,22 @@
 
 .formStack input:focus,
 .formStack select:focus,
-.formStack textarea:focus {
+.formStack textarea:focus,
+.formGrid input:focus,
+.formGrid select:focus,
+.formGrid textarea:focus {
   border-color: rgba(185, 28, 28, 0.5);
   box-shadow: 0 0 0 4px rgba(219, 36, 28, 0.08);
+}
+
+.memberItem strong.statusReady {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.memberItem strong.statusWaiting {
+  background: rgba(219, 36, 28, 0.08);
+  color: #b91c1c;
 }
 
 .accent {
@@ -426,7 +643,9 @@
 }
 
 @media (max-width: 1180px) {
-  .statsGrid {
+  .statsGrid,
+  .workflowGrid,
+  .registrationGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -451,14 +670,34 @@
     padding: 20px;
   }
 
+  .heroTitle {
+    font-size: 32px;
+  }
+
   .statsGrid,
+  .workflowGrid,
+  .registrationGrid,
+  .formGrid,
+  .groupMetrics,
   .sidePanel {
     grid-template-columns: 1fr;
   }
 
   .sectionHeader,
-  .detailHeader {
+  .detailHeader,
+  .pendingHeader {
     flex-direction: column;
+  }
+
+  .searchBox {
+    width: 100%;
+  }
+
+  .sectionBlock,
+  .panelCard,
+  .detailCard,
+  .pendingCard {
+    padding: 18px;
   }
 
   .memberItem {

@@ -1,5 +1,34 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import axios from "axios";
+import {
+  FaArchive,
+  FaBroom,
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaClipboardList,
+  FaClock,
+  FaDumbbell,
+  FaEdit,
+  FaEye,
+  FaFilter,
+  FaImage,
+  FaLayerGroup,
+  FaLink,
+  FaPlus,
+  FaRegFileAlt,
+  FaRunning,
+  FaSave,
+  FaSearch,
+  FaTrash,
+  FaVideo,
+} from "react-icons/fa";
 import {
   createTrainerRoutine,
   updateTrainerRoutine,
@@ -60,6 +89,12 @@ const categoryLabels: Record<RoutineCategory, string> = {
   resistencia: "Resistencia",
   movilidad: "Movilidad",
   general: "General",
+};
+
+const statusIcons: Record<RoutineStatus, ReactNode> = {
+  draft: <FaRegFileAlt />,
+  published: <FaCheckCircle />,
+  archived: <FaArchive />,
 };
 
 export default function TrainerRoutinesPage() {
@@ -362,7 +397,7 @@ export default function TrainerRoutinesPage() {
   return (
     <section className={styles.page}>
       <header className={styles.hero}>
-        <div>
+        <div className={styles.heroCopy}>
           <span className={styles.eyebrow}>Panel de entrenador</span>
           <h1>Rutinas y planes</h1>
           <p>
@@ -370,27 +405,55 @@ export default function TrainerRoutinesPage() {
             Las rutinas publicadas después podrán aparecer para los clientes con suscripción.
           </p>
         </div>
+
+        <div className={styles.heroBadge} aria-hidden="true">
+          <FaDumbbell />
+        </div>
       </header>
 
       <section className={styles.statsGrid}>
         <article className={styles.statCard}>
-          <span>Total</span>
-          <strong>{stats.total}</strong>
+          <span className={styles.statIcon}>
+            <FaClipboardList />
+          </span>
+          <div>
+            <span>Total</span>
+            <strong>{stats.total}</strong>
+            <p>Rutinas creadas</p>
+          </div>
         </article>
 
         <article className={styles.statCard}>
-          <span>Publicadas</span>
-          <strong>{stats.published}</strong>
+          <span className={styles.statIcon}>
+            <FaCheckCircle />
+          </span>
+          <div>
+            <span>Publicadas</span>
+            <strong>{stats.published}</strong>
+            <p>Visibles tras revisión</p>
+          </div>
         </article>
 
         <article className={styles.statCard}>
-          <span>Borradores</span>
-          <strong>{stats.draft}</strong>
+          <span className={styles.statIcon}>
+            <FaRegFileAlt />
+          </span>
+          <div>
+            <span>Borradores</span>
+            <strong>{stats.draft}</strong>
+            <p>En preparación</p>
+          </div>
         </article>
 
         <article className={styles.statCard}>
-          <span>Archivadas</span>
-          <strong>{stats.archived}</strong>
+          <span className={styles.statIcon}>
+            <FaArchive />
+          </span>
+          <div>
+            <span>Archivadas</span>
+            <strong>{stats.archived}</strong>
+            <p>Fuera de uso</p>
+          </div>
         </article>
       </section>
 
@@ -404,6 +467,10 @@ export default function TrainerRoutinesPage() {
               {isEditing ? "Editando rutina" : "Nueva rutina"}
             </span>
             <h2>{isEditing ? editingRoutine?.title : "Crear rutina"}</h2>
+            <p>
+              Completa la información base, agrega material multimedia y ordena
+              los ejercicios por día.
+            </p>
           </div>
 
           {isEditing ? (
@@ -414,133 +481,177 @@ export default function TrainerRoutinesPage() {
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.gridTwo}>
+          <section className={styles.formSection}>
+            <div className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}>
+                <FaClipboardList />
+              </span>
+              <div>
+                <h3>Información principal</h3>
+                <p>Define cómo se identificará la rutina para administración y clientes.</p>
+              </div>
+            </div>
+
+            <div className={styles.gridTwo}>
+              <label>
+                <span>Nombre de la rutina</span>
+                <input
+                  name="title"
+                  value={form.title}
+                  onChange={handleInputChange}
+                  placeholder="Ej. Hipertrofia inicial"
+                  required
+                />
+              </label>
+
+              <label>
+                <span>Objetivo</span>
+                <input
+                  name="objective"
+                  value={form.objective}
+                  onChange={handleInputChange}
+                  placeholder="Ej. Ganancia muscular"
+                />
+              </label>
+
+              <label>
+                <span>Nivel</span>
+                <select name="level" value={form.level} onChange={handleInputChange}>
+                  <option value="principiante">Principiante</option>
+                  <option value="intermedio">Intermedio</option>
+                  <option value="avanzado">Avanzado</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Categoría</span>
+                <select name="category" value={form.category} onChange={handleInputChange}>
+                  <option value="general">General</option>
+                  <option value="fuerza">Fuerza</option>
+                  <option value="hipertrofia">Hipertrofia</option>
+                  <option value="perdida_peso">Pérdida de peso</option>
+                  <option value="resistencia">Resistencia</option>
+                  <option value="movilidad">Movilidad</option>
+                </select>
+              </label>
+            </div>
+
             <label>
-              <span>Nombre de la rutina</span>
-              <input
-                name="title"
-                value={form.title}
+              <span>Descripción</span>
+              <textarea
+                name="description"
+                value={form.description}
                 onChange={handleInputChange}
-                placeholder="Ej. Hipertrofia inicial"
-                required
+                placeholder="Explica para quién es esta rutina, cómo se trabaja y recomendaciones generales."
+                rows={4}
               />
             </label>
+          </section>
+
+          <section className={styles.formSection}>
+            <div className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}>
+                <FaCalendarAlt />
+              </span>
+              <div>
+                <h3>Duración y publicación</h3>
+                <p>Configura la carga semanal y el estado inicial de la rutina.</p>
+              </div>
+            </div>
+
+            <div className={styles.gridFour}>
+              <label>
+                <span>Duración en semanas</span>
+                <input
+                  type="number"
+                  name="durationWeeks"
+                  value={form.durationWeeks}
+                  onChange={handleInputChange}
+                  min={1}
+                />
+              </label>
+
+              <label>
+                <span>Días por semana</span>
+                <input
+                  type="number"
+                  name="daysPerWeek"
+                  value={form.daysPerWeek}
+                  onChange={handleInputChange}
+                  min={1}
+                />
+              </label>
+
+              <label>
+                <span>Minutos por sesión</span>
+                <input
+                  type="number"
+                  name="estimatedMinutes"
+                  value={form.estimatedMinutes}
+                  onChange={handleInputChange}
+                  min={1}
+                />
+              </label>
+
+              <label>
+                <span>Estado</span>
+                <select name="status" value={form.status} onChange={handleInputChange}>
+                  <option value="draft">Borrador</option>
+                  <option value="published">Publicada</option>
+                  <option value="archived">Archivada</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section className={styles.formSection}>
+            <div className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}>
+                <FaImage />
+              </span>
+              <div>
+                <h3>Material visual</h3>
+                <p>Agrega portada, video cargado o enlace externo para reforzar la rutina.</p>
+              </div>
+            </div>
+
+            <div className={styles.gridTwo}>
+              <label>
+                <span>
+                  <FaImage /> Imagen de portada
+                </span>
+                <input type="file" accept="image/*" onChange={handleImageChange} />
+                {editingRoutine?.imageUrl ? (
+                  <small>Si subes otra imagen, reemplazará la actual.</small>
+                ) : null}
+              </label>
+
+              <label>
+                <span>
+                  <FaVideo /> Video de la rutina
+                </span>
+                <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoChange} />
+                {editingRoutine?.videoType === "upload" ? (
+                  <small>Si subes otro video, reemplazará el actual.</small>
+                ) : null}
+              </label>
+            </div>
 
             <label>
-              <span>Objetivo</span>
+              <span>
+                <FaLink /> Link de video
+              </span>
               <input
-                name="objective"
-                value={form.objective}
+                name="videoUrl"
+                value={form.videoUrl}
                 onChange={handleInputChange}
-                placeholder="Ej. Ganancia muscular"
+                placeholder="YouTube, Google Drive o link externo"
               />
+              <small>
+                Puedes subir un video o pegar un link. Si subes archivo, el archivo tiene prioridad.
+              </small>
             </label>
-
-            <label>
-              <span>Nivel</span>
-              <select name="level" value={form.level} onChange={handleInputChange}>
-                <option value="principiante">Principiante</option>
-                <option value="intermedio">Intermedio</option>
-                <option value="avanzado">Avanzado</option>
-              </select>
-            </label>
-
-            <label>
-              <span>Categoría</span>
-              <select name="category" value={form.category} onChange={handleInputChange}>
-                <option value="general">General</option>
-                <option value="fuerza">Fuerza</option>
-                <option value="hipertrofia">Hipertrofia</option>
-                <option value="perdida_peso">Pérdida de peso</option>
-                <option value="resistencia">Resistencia</option>
-                <option value="movilidad">Movilidad</option>
-              </select>
-            </label>
-
-            <label>
-              <span>Duración en semanas</span>
-              <input
-                type="number"
-                name="durationWeeks"
-                value={form.durationWeeks}
-                onChange={handleInputChange}
-                min={1}
-              />
-            </label>
-
-            <label>
-              <span>Días por semana</span>
-              <input
-                type="number"
-                name="daysPerWeek"
-                value={form.daysPerWeek}
-                onChange={handleInputChange}
-                min={1}
-              />
-            </label>
-
-            <label>
-              <span>Minutos por sesión</span>
-              <input
-                type="number"
-                name="estimatedMinutes"
-                value={form.estimatedMinutes}
-                onChange={handleInputChange}
-                min={1}
-              />
-            </label>
-
-            <label>
-              <span>Estado</span>
-              <select name="status" value={form.status} onChange={handleInputChange}>
-                <option value="draft">Borrador</option>
-                <option value="published">Publicada</option>
-                <option value="archived">Archivada</option>
-              </select>
-            </label>
-          </div>
-
-          <label>
-            <span>Descripción</span>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleInputChange}
-              placeholder="Explica para quién es esta rutina, cómo se trabaja y recomendaciones generales."
-              rows={4}
-            />
-          </label>
-
-          <div className={styles.gridTwo}>
-            <label>
-              <span>Imagen de portada</span>
-              <input type="file" accept="image/*" onChange={handleImageChange} />
-              {editingRoutine?.imageUrl ? (
-                <small>Si subes otra imagen, reemplazará la actual.</small>
-              ) : null}
-            </label>
-
-            <label>
-              <span>Video de la rutina</span>
-              <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoChange} />
-              {editingRoutine?.videoType === "upload" ? (
-                <small>Si subes otro video, reemplazará el actual.</small>
-              ) : null}
-            </label>
-          </div>
-
-          <label>
-            <span>Link de video</span>
-            <input
-              name="videoUrl"
-              value={form.videoUrl}
-              onChange={handleInputChange}
-              placeholder="YouTube, Google Drive o link externo"
-            />
-            <small>
-              Puedes subir un video o pegar un link. Si subes archivo, el archivo tiene prioridad.
-            </small>
-          </label>
+          </section>
 
           {editingRoutine?.videoUrl ? (
             <label className={styles.checkboxRow}>
@@ -563,9 +674,11 @@ export default function TrainerRoutinesPage() {
               <div>
                 <span className={styles.eyebrow}>Ejercicios</span>
                 <h3>Ejercicios de la rutina</h3>
+                <p>Ordena cada ejercicio por día, series, repeticiones y descanso.</p>
               </div>
 
               <button type="button" className={styles.secondaryBtn} onClick={addExercise}>
+                <FaPlus />
                 Agregar ejercicio
               </button>
             </div>
@@ -574,13 +687,17 @@ export default function TrainerRoutinesPage() {
               {form.exercises.map((exercise, index) => (
                 <article className={styles.exerciseCard} key={`${index}-${exercise.order}`}>
                   <div className={styles.exerciseHeader}>
-                    <strong>Ejercicio {index + 1}</strong>
+                    <strong>
+                      <FaRunning />
+                      Ejercicio {index + 1}
+                    </strong>
 
                     <button
                       type="button"
                       className={styles.dangerLightBtn}
                       onClick={() => removeExercise(index)}
                     >
+                      <FaTrash />
                       Quitar
                     </button>
                   </div>
@@ -675,6 +792,7 @@ export default function TrainerRoutinesPage() {
 
           <div className={styles.formActions}>
             <button type="submit" className={styles.primaryBtn} disabled={saving}>
+              <FaSave />
               {saving
                 ? "Guardando..."
                 : isEditing
@@ -683,6 +801,7 @@ export default function TrainerRoutinesPage() {
             </button>
 
             <button type="button" className={styles.secondaryBtn} onClick={resetForm}>
+              <FaBroom />
               Limpiar
             </button>
           </div>
@@ -694,26 +813,33 @@ export default function TrainerRoutinesPage() {
           <div>
             <span className={styles.eyebrow}>Mis rutinas</span>
             <h2>Rutinas creadas</h2>
+            <p>Consulta, edita, publica o archiva tus rutinas registradas.</p>
           </div>
 
           <div className={styles.filters}>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar rutina..."
-            />
+            <label className={styles.filterControl}>
+              <FaSearch />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Buscar rutina..."
+              />
+            </label>
 
-            <select
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as "todos" | RoutineStatus)
-              }
-            >
-              <option value="todos">Todos</option>
-              <option value="draft">Borradores</option>
-              <option value="published">Publicadas</option>
-              <option value="archived">Archivadas</option>
-            </select>
+            <label className={styles.filterControl}>
+              <FaFilter />
+              <select
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as "todos" | RoutineStatus)
+                }
+              >
+                <option value="todos">Todos</option>
+                <option value="draft">Borradores</option>
+                <option value="published">Publicadas</option>
+                <option value="archived">Archivadas</option>
+              </select>
+            </label>
           </div>
         </div>
 
@@ -727,13 +853,17 @@ export default function TrainerRoutinesPage() {
                   {routine.imageUrl ? (
                     <img src={routine.imageUrl} alt={routine.title} />
                   ) : (
-                    <span>Sin imagen</span>
+                    <span>
+                      <FaImage />
+                      Sin imagen
+                    </span>
                   )}
                 </div>
 
                 <div className={styles.cardBody}>
                   <div className={styles.cardTop}>
                     <span className={`${styles.status} ${styles[routine.status]}`}>
+                      {statusIcons[routine.status]}
                       {statusLabels[routine.status]}
                     </span>
                     <span className={styles.level}>{levelLabels[routine.level]}</span>
@@ -743,10 +873,18 @@ export default function TrainerRoutinesPage() {
                   <p>{routine.objective || "Sin objetivo definido"}</p>
 
                   <div className={styles.metaGrid}>
-                    <span>{categoryLabels[routine.category]}</span>
-                    <span>{routine.durationWeeks} semanas</span>
-                    <span>{routine.daysPerWeek} días/semana</span>
-                    <span>{routine.estimatedMinutes} min</span>
+                    <span>
+                      <FaLayerGroup /> {categoryLabels[routine.category]}
+                    </span>
+                    <span>
+                      <FaCalendarAlt /> {routine.durationWeeks} semanas
+                    </span>
+                    <span>
+                      <FaDumbbell /> {routine.daysPerWeek} días/semana
+                    </span>
+                    <span>
+                      <FaClock /> {routine.estimatedMinutes} min
+                    </span>
                   </div>
 
                   <div className={styles.cardActions}>
@@ -755,6 +893,7 @@ export default function TrainerRoutinesPage() {
                       className={styles.secondaryBtn}
                       onClick={() => setSelectedRoutine(routine)}
                     >
+                      <FaEye />
                       Ver
                     </button>
 
@@ -763,6 +902,7 @@ export default function TrainerRoutinesPage() {
                       className={styles.secondaryBtn}
                       onClick={() => fillFormForEdit(routine)}
                     >
+                      <FaEdit />
                       Editar
                     </button>
 
@@ -772,6 +912,7 @@ export default function TrainerRoutinesPage() {
                         className={styles.primarySmallBtn}
                         onClick={() => void handlePublish(routine)}
                       >
+                        <FaCheckCircle />
                         Publicar
                       </button>
                     ) : (
@@ -780,6 +921,7 @@ export default function TrainerRoutinesPage() {
                         className={styles.secondaryBtn}
                         onClick={() => void handleArchive(routine)}
                       >
+                        <FaArchive />
                         Archivar
                       </button>
                     )}
@@ -789,6 +931,7 @@ export default function TrainerRoutinesPage() {
                       className={styles.dangerBtn}
                       onClick={() => void handleDelete(routine)}
                     >
+                      <FaTrash />
                       Eliminar
                     </button>
                   </div>
@@ -816,6 +959,7 @@ export default function TrainerRoutinesPage() {
 
             <div className={styles.modalHeader}>
               <span className={`${styles.status} ${styles[selectedRoutine.status]}`}>
+                {statusIcons[selectedRoutine.status]}
                 {statusLabels[selectedRoutine.status]}
               </span>
               <h2>{selectedRoutine.title}</h2>
@@ -842,11 +986,21 @@ export default function TrainerRoutinesPage() {
             ) : null}
 
             <div className={styles.metaGridModal}>
-              <span>Nivel: {levelLabels[selectedRoutine.level]}</span>
-              <span>Categoría: {categoryLabels[selectedRoutine.category]}</span>
-              <span>Duración: {selectedRoutine.durationWeeks} semanas</span>
-              <span>Días: {selectedRoutine.daysPerWeek} por semana</span>
-              <span>Tiempo: {selectedRoutine.estimatedMinutes} min</span>
+              <span>
+                <FaDumbbell /> Nivel: {levelLabels[selectedRoutine.level]}
+              </span>
+              <span>
+                <FaLayerGroup /> Categoría: {categoryLabels[selectedRoutine.category]}
+              </span>
+              <span>
+                <FaCalendarAlt /> Duración: {selectedRoutine.durationWeeks} semanas
+              </span>
+              <span>
+                <FaClipboardList /> Días: {selectedRoutine.daysPerWeek} por semana
+              </span>
+              <span>
+                <FaClock /> Tiempo: {selectedRoutine.estimatedMinutes} min
+              </span>
             </div>
 
             <section className={styles.modalExercises}>

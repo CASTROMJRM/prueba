@@ -1,46 +1,37 @@
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { IconType } from "react-icons";
 import {
   FaBolt,
+  FaCalendarAlt,
   FaCheck,
   FaChevronDown,
   FaChevronLeft,
   FaChevronRight,
   FaCrown,
   FaDumbbell,
+  FaExclamationTriangle,
   FaFireAlt,
-  FaInfinity,
   FaQuoteRight,
   FaShieldAlt,
   FaStar,
-  FaTimes,
+  FaSyncAlt,
+  FaTicketAlt,
+  FaUserGraduate,
+  FaUsers,
 } from "react-icons/fa";
+import {
+  getMembershipPlans,
+  type MembershipPlan,
+} from "../../services/membershipService";
 import styles from "./SuscripcionesPage.module.css";
 
-type BillingMode = "monthly" | "annual";
 type PlanTheme = "light" | "dark";
+type PlansStatus = "loading" | "ready" | "error";
 
 type HeroBenefit = {
   label: string;
   icon: IconType;
-};
-
-type PlanFeature = {
-  label: string;
-  included: boolean;
-};
-
-type Plan = {
-  id: string;
-  name: string;
-  description: string;
-  icon: IconType;
-  theme: PlanTheme;
-  featured: boolean;
-  monthlyPrice: number;
-  annualPrice: number;
-  features: PlanFeature[];
 };
 
 type Testimonial = {
@@ -56,73 +47,18 @@ type FaqItem = {
   answer: string;
 };
 
-const heroBenefits: HeroBenefit[] = [
-  { label: "Sin permanencia", icon: FaBolt },
-  { label: "Garantia 30 dias", icon: FaShieldAlt },
-  { label: "Acceso ilimitado", icon: FaInfinity },
-];
+type PlanSection = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  plans: MembershipPlan[];
+};
 
-const plans: Plan[] = [
-  {
-    id: "basic",
-    name: "Basico",
-    description: "Perfecto para comenzar tu rutina fitness con una base solida.",
-    icon: FaDumbbell,
-    theme: "light",
-    featured: false,
-    monthlyPrice: 499,
-    annualPrice: 415,
-    features: [
-      { label: "Acceso al gimnasio", included: true },
-      { label: "Horario limitado (6am - 6pm)", included: true },
-      { label: "Equipos de cardio", included: true },
-      { label: "Vestuarios y duchas", included: true },
-      { label: "App de seguimiento", included: false },
-      { label: "Clases grupales", included: false },
-      { label: "Entrenador personal", included: false },
-      { label: "Acceso 24/7", included: false },
-    ],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    description: "El plan favorito para avanzar mas rapido con una experiencia mas completa.",
-    icon: FaCrown,
-    theme: "dark",
-    featured: true,
-    monthlyPrice: 799,
-    annualPrice: 665,
-    features: [
-      { label: "Acceso al gimnasio", included: true },
-      { label: "Horario completo", included: true },
-      { label: "Todos los equipos", included: true },
-      { label: "Vestuarios y duchas", included: true },
-      { label: "App de seguimiento", included: true },
-      { label: "Clases grupales ilimitadas", included: true },
-      { label: "1 sesion de entrenador / mes", included: true },
-      { label: "Acceso 24/7", included: false },
-    ],
-  },
-  {
-    id: "elite",
-    name: "Elite",
-    description: "Pensado para quienes buscan resultados fuertes, atencion y mayor libertad.",
-    icon: FaFireAlt,
-    theme: "light",
-    featured: false,
-    monthlyPrice: 1199,
-    annualPrice: 995,
-    features: [
-      { label: "Acceso al gimnasio", included: true },
-      { label: "Horario completo", included: true },
-      { label: "Todos los equipos", included: true },
-      { label: "Vestuarios VIP", included: true },
-      { label: "App de seguimiento premium", included: true },
-      { label: "Clases grupales ilimitadas", included: true },
-      { label: "4 sesiones de entrenador / mes", included: true },
-      { label: "Acceso 24/7", included: true },
-    ],
-  },
+const heroBenefits: HeroBenefit[] = [
+  { label: "Planes por dias", icon: FaCalendarAlt },
+  { label: "Paquetes separados", icon: FaUsers },
+  { label: "Sin permanencia", icon: FaBolt },
 ];
 
 const testimonials: Testimonial[] = [
@@ -175,6 +111,21 @@ const faqs: FaqItem[] = [
   },
 ];
 
+const mxnPriceFormatter = new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN",
+  maximumFractionDigits: 0,
+});
+
+function toFiniteNumber(value: string | number | null | undefined, fallback = 0) {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : fallback;
+}
+
+function formatPriceMXN(value: string | number | null | undefined) {
+  return mxnPriceFormatter.format(toFiniteNumber(value));
+}
+
 function getInitials(value: string) {
   const parts = value
     .trim()
@@ -189,27 +140,167 @@ function getInitials(value: string) {
   return parts.map((part) => part[0]?.toUpperCase() ?? "").join("");
 }
 
-function getAnnualSavings(plan: Plan) {
-  return Math.round((1 - plan.annualPrice / plan.monthlyPrice) * 100);
+function getPlanDurationDays(plan: MembershipPlan) {
+  const days = Math.round(toFiniteNumber(plan.durationDays, 1));
+  return Math.max(days, 1);
 }
 
-const mxnPriceFormatter = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+function formatDurationLabel(days: number) {
+  return days === 1 ? "1 dia" : `${days} dias`;
+}
 
-function formatPriceMXN(value: number) {
-  return mxnPriceFormatter.format(value);
+function getPlanTypeLabel(plan: MembershipPlan) {
+  switch (plan.type) {
+    case "group":
+      return "Paquete";
+    case "student":
+      return "Estudiante";
+    case "visit":
+      return "Pase";
+    default:
+      return "Individual";
+  }
+}
+
+function getPeopleLabel(plan: MembershipPlan) {
+  const minPeople = Math.max(Math.round(toFiniteNumber(plan.minPeople, 1)), 1);
+  const maxPeople = Math.max(Math.round(toFiniteNumber(plan.maxPeople, 1)), 1);
+
+  if (plan.type !== "group") {
+    return "1 persona";
+  }
+
+  if (minPeople === maxPeople) {
+    return `${maxPeople} personas`;
+  }
+
+  return `${minPeople}-${maxPeople} personas`;
+}
+
+function getPlanIcon(plan: MembershipPlan): IconType {
+  if (plan.type === "group") return FaUsers;
+  if (plan.type === "student") return FaUserGraduate;
+  if (plan.type === "visit") return FaTicketAlt;
+  if (plan.accessLevel === "premium" || getPlanDurationDays(plan) >= 180) {
+    return FaCrown;
+  }
+  if (plan.accessLevel === "standard") return FaDumbbell;
+  return FaFireAlt;
+}
+
+function isFeaturedPlan(plan: MembershipPlan) {
+  const slug = plan.slug.toLowerCase();
+
+  if (plan.type === "group") {
+    return getPeopleLabel(plan) === "2 personas";
+  }
+
+  return (
+    slug.includes("regular-mensual") ||
+    (plan.type === "individual" && getPlanDurationDays(plan) === 30)
+  );
+}
+
+function getPlanTheme(plan: MembershipPlan): PlanTheme {
+  return isFeaturedPlan(plan) ? "dark" : "light";
+}
+
+function getPlanPriceSuffix(plan: MembershipPlan) {
+  const duration = formatDurationLabel(getPlanDurationDays(plan));
+
+  if (plan.type === "group") {
+    return `MXN paquete / ${duration}`;
+  }
+
+  if (plan.type === "visit") {
+    return "MXN / visita";
+  }
+
+  return `MXN / ${duration}`;
+}
+
+function getPlanPriceMeta(plan: MembershipPlan) {
+  const duration = formatDurationLabel(getPlanDurationDays(plan));
+
+  if (plan.type === "group") {
+    return `${formatPriceMXN(plan.pricePerPerson)} por persona. Vigencia de ${duration}.`;
+  }
+
+  if (plan.type === "student") {
+    return `Tarifa especial con credencial vigente. Vigencia de ${duration}.`;
+  }
+
+  if (plan.type === "visit") {
+    return "Acceso de un solo dia, ideal para probar el gimnasio.";
+  }
+
+  return `Vigencia clara de ${duration}, sin mezclarlo con paquetes.`;
+}
+
+function getPlanBenefits(plan: MembershipPlan) {
+  const benefits = Array.isArray(plan.benefits)
+    ? plan.benefits.map((benefit) => String(benefit).trim()).filter(Boolean)
+    : [];
+
+  if (benefits.length > 0) {
+    return benefits;
+  }
+
+  const duration = formatDurationLabel(getPlanDurationDays(plan));
+
+  if (plan.type === "group") {
+    return [
+      `Acceso para ${getPeopleLabel(plan)}`,
+      `Vigencia de ${duration}`,
+      "Cada integrante conserva su membresia",
+    ];
+  }
+
+  return [
+    `Acceso al gimnasio por ${duration}`,
+    "Activacion registrada por administracion",
+    "Consulta de pagos desde el portal",
+  ];
+}
+
+function sortPlansByOrder(plans: MembershipPlan[]) {
+  return [...plans].sort((firstPlan, secondPlan) => {
+    const orderDifference =
+      toFiniteNumber(firstPlan.sortOrder) - toFiniteNumber(secondPlan.sortOrder);
+
+    if (orderDifference !== 0) {
+      return orderDifference;
+    }
+
+    return getPlanDurationDays(firstPlan) - getPlanDurationDays(secondPlan);
+  });
 }
 
 export default function SuscripcionesPage() {
-  const [billingMode, setBillingMode] = useState<BillingMode>("monthly");
+  const [plans, setPlans] = useState<MembershipPlan[]>([]);
+  const [plansStatus, setPlansStatus] = useState<PlansStatus>("loading");
   const [activeFaqIndex, setActiveFaqIndex] = useState(0);
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
 
+  async function loadPlans() {
+    setPlansStatus("loading");
+
+    try {
+      const response = await getMembershipPlans();
+      const loadedPlans = Array.isArray(response?.plans) ? response.plans : [];
+
+      setPlans(sortPlansByOrder(loadedPlans));
+      setPlansStatus("ready");
+    } catch (error) {
+      console.error("PUBLIC MEMBERSHIP PLANS ERROR:", error);
+      setPlans([]);
+      setPlansStatus("error");
+    }
+  }
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
+    void loadPlans();
   }, []);
 
   useEffect(() => {
@@ -223,6 +314,44 @@ export default function SuscripcionesPage() {
 
     return () => window.clearInterval(intervalId);
   }, []);
+
+  const planSections = useMemo<PlanSection[]>(() => {
+    const activePlans = plans.filter((plan) => plan.isActive);
+    const shortStayPlans = activePlans.filter(
+      (plan) => plan.type !== "group" && getPlanDurationDays(plan) < 30,
+    );
+    const membershipPlans = activePlans.filter(
+      (plan) => plan.type !== "group" && getPlanDurationDays(plan) >= 30,
+    );
+    const packagePlans = activePlans.filter((plan) => plan.type === "group");
+
+    return [
+      {
+        id: "pases",
+        eyebrow: "Pases por dias",
+        title: "Visitas, semana y quincena",
+        description:
+          "Opciones cortas para entrenar por dia o por periodos pequenos, sin mezclarlas con paquetes.",
+        plans: shortStayPlans,
+      },
+      {
+        id: "membresias",
+        eyebrow: "Membresias",
+        title: "Planes individuales",
+        description:
+          "Planes por duracion definida: mensual, estudiante, semestre y anualidad.",
+        plans: membershipPlans,
+      },
+      {
+        id: "paquetes",
+        eyebrow: "Paquetes grupales",
+        title: "Paquetes separados",
+        description:
+          "Planes para grupos con precio total y costo por persona visible desde la tarjeta.",
+        plans: packagePlans,
+      },
+    ].filter((section) => section.plans.length > 0);
+  }, [plans]);
 
   const activeTestimonial = testimonials[activeTestimonialIndex];
 
@@ -258,9 +387,9 @@ export default function SuscripcionesPage() {
             </h1>
 
             <p className={styles.heroDescription}>
-              Accede a instalaciones de primer nivel, entrenadores certificados
-              y una comunidad comprometida con tu transformacion. Sin contratos
-              largos, cancela cuando quieras.
+              Consulta las opciones reales del sistema: pases por dias,
+              membresias individuales y paquetes grupales separados. Cada plan
+              muestra su duracion, precio y beneficios de forma clara.
             </p>
 
             <div className={styles.heroBenefits}>
@@ -300,127 +429,174 @@ export default function SuscripcionesPage() {
               Nuestros <span className={styles.sectionAccent}>Planes</span>
             </h2>
             <p className={styles.sectionDescription}>
-              Elige el plan que mejor se adapta a tus objetivos y estilo de
-              vida.
+              Elige por duracion, tipo de acceso o paquete grupal. La vista
+              publica toma estos datos desde el catalogo de membresias.
             </p>
           </div>
 
-          <div className={styles.billingToggle} role="tablist" aria-label="Facturacion">
-            <button
-              type="button"
-              className={`${styles.billingButton} ${
-                billingMode === "monthly" ? styles.billingButtonActive : ""
-              }`}
-              onClick={() => startTransition(() => setBillingMode("monthly"))}
-              aria-pressed={billingMode === "monthly"}
-            >
-              Mensual
-            </button>
+          {plansStatus === "loading" ? (
+            <div className={styles.planState}>
+              <span className={styles.planStateIcon}>
+                <FaSyncAlt />
+              </span>
+              <strong>Cargando planes disponibles...</strong>
+              <p>Estamos consultando las membresias activas del sistema.</p>
+            </div>
+          ) : null}
 
-            <button
-              type="button"
-              className={`${styles.billingButton} ${
-                billingMode === "annual" ? styles.billingButtonActive : ""
-              }`}
-              onClick={() => startTransition(() => setBillingMode("annual"))}
-              aria-pressed={billingMode === "annual"}
-            >
-              <span>Anual</span>
-              <span className={styles.billingDiscount}>-17%</span>
-            </button>
-          </div>
+          {plansStatus === "error" ? (
+            <div className={styles.planState}>
+              <span className={styles.planStateIcon}>
+                <FaExclamationTriangle />
+              </span>
+              <strong>No se pudieron cargar los planes</strong>
+              <p>
+                Revisa que el backend este activo para mostrar la informacion
+                publica de membresias.
+              </p>
+              <button
+                type="button"
+                className={styles.planStateButton}
+                onClick={() => void loadPlans()}
+              >
+                <FaSyncAlt />
+                Reintentar
+              </button>
+            </div>
+          ) : null}
 
-          <div className={styles.plansGrid}>
-            {plans.map((plan, index) => {
-              const Icon = plan.icon;
-              const price =
-                billingMode === "monthly" ? plan.monthlyPrice : plan.annualPrice;
-              const savings = getAnnualSavings(plan);
+          {plansStatus === "ready" && planSections.length === 0 ? (
+            <div className={styles.planState}>
+              <span className={styles.planStateIcon}>
+                <FaShieldAlt />
+              </span>
+              <strong>No hay planes activos por ahora</strong>
+              <p>Cuando se activen membresias, apareceran en esta seccion.</p>
+            </div>
+          ) : null}
 
-              return (
-                <article
-                  key={plan.id}
-                  className={`${styles.planCard} ${
-                    plan.theme === "dark" ? styles.planCardDark : styles.planCardLight
-                  } ${plan.featured ? styles.planCardFeatured : ""}`}
-                  style={{ animationDelay: `${index * 120}ms` }}
-                >
-                  {plan.featured ? (
-                    <div className={styles.planPopularBadge}>
-                      <FaStar />
-                      <span>Mas popular</span>
-                    </div>
-                  ) : null}
-
-                  <div className={styles.planHeader}>
-                    <div className={styles.planIdentity}>
-                      <span className={styles.planIconWrap}>
-                        <Icon />
-                      </span>
-
-                      <div>
-                        <h3 className={styles.planName}>{plan.name}</h3>
-                        <p className={styles.planBlurb}>{plan.description}</p>
-                      </div>
-                    </div>
-
-                    <div className={styles.planPriceGroup}>
-                      <div className={styles.planPriceLine}>
-                        <strong className={styles.planPrice}>
-                          {formatPriceMXN(price)}
-                        </strong>
-                        <span className={styles.planPriceSuffix}>MXN / mes</span>
-                      </div>
-
-                      <p className={styles.planPriceMeta}>
-                        {billingMode === "monthly"
-                          ? "Sin ataduras y con renovacion flexible."
-                          : `Facturado anual. Ahorras ${savings}% contra el pago mensual.`}
-                      </p>
-                    </div>
+          {plansStatus === "ready" && planSections.length > 0 ? (
+            <div className={styles.plansContent}>
+              {planSections.map((section) => (
+                <section key={section.id} className={styles.planGroup}>
+                  <div className={styles.planGroupHeader}>
+                    <span className={styles.planGroupKicker}>{section.eyebrow}</span>
+                    <h3 className={styles.planGroupTitle}>{section.title}</h3>
+                    <p className={styles.planGroupDescription}>
+                      {section.description}
+                    </p>
                   </div>
 
-                  <ul className={styles.featureList}>
-                    {plan.features.map((feature) => (
-                      <li
-                        key={feature.label}
-                        className={`${styles.featureItem} ${
-                          feature.included
-                            ? styles.featureItemIncluded
-                            : styles.featureItemDisabled
-                        }`}
-                      >
-                        <span
-                          className={`${styles.featureIcon} ${
-                            feature.included
-                              ? styles.featureIconIncluded
-                              : styles.featureIconDisabled
-                          }`}
-                        >
-                          {feature.included ? <FaCheck /> : <FaTimes />}
-                        </span>
-                        <span>{feature.label}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className={styles.plansGrid}>
+                    {section.plans.map((plan, index) => {
+                      const Icon = getPlanIcon(plan);
+                      const theme = getPlanTheme(plan);
+                      const featured = isFeaturedPlan(plan);
+                      const benefits = getPlanBenefits(plan).slice(0, 5);
 
-                  <Link
-                    to="/register"
-                    className={`${styles.planButton} ${
-                      plan.featured ? styles.planButtonFeatured : styles.planButtonNeutral
-                    }`}
-                  >
-                    Comenzar Ahora
-                  </Link>
-                </article>
-              );
-            })}
-          </div>
+                      return (
+                        <article
+                          key={plan.id}
+                          className={`${styles.planCard} ${
+                            theme === "dark"
+                              ? styles.planCardDark
+                              : styles.planCardLight
+                          } ${featured ? styles.planCardFeatured : ""}`}
+                          style={{ animationDelay: `${index * 120}ms` }}
+                        >
+                          {featured ? (
+                            <div className={styles.planPopularBadge}>
+                              <FaStar />
+                              <span>Mas elegido</span>
+                            </div>
+                          ) : null}
+
+                          <div className={styles.planHeader}>
+                            <div className={styles.planIdentity}>
+                              <span className={styles.planIconWrap}>
+                                <Icon />
+                              </span>
+
+                              <div>
+                                <h3 className={styles.planName}>{plan.name}</h3>
+                                <p className={styles.planBlurb}>
+                                  {plan.description ||
+                                    "Plan activo del catalogo Titanium."}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className={styles.planMetaGrid}>
+                              <span className={styles.planMetaPill}>
+                                <FaCalendarAlt />
+                                {formatDurationLabel(getPlanDurationDays(plan))}
+                              </span>
+                              <span className={styles.planMetaPill}>
+                                <FaUsers />
+                                {getPeopleLabel(plan)}
+                              </span>
+                              <span className={styles.planMetaPill}>
+                                {getPlanTypeLabel(plan)}
+                              </span>
+                            </div>
+
+                            <div className={styles.planPriceGroup}>
+                              <div className={styles.planPriceLine}>
+                                <strong className={styles.planPrice}>
+                                  {formatPriceMXN(plan.price)}
+                                </strong>
+                                <span className={styles.planPriceSuffix}>
+                                  {getPlanPriceSuffix(plan)}
+                                </span>
+                              </div>
+
+                              <p className={styles.planPriceMeta}>
+                                {getPlanPriceMeta(plan)}
+                              </p>
+                            </div>
+                          </div>
+
+                          <ul className={styles.featureList}>
+                            {benefits.map((benefit) => (
+                              <li
+                                key={benefit}
+                                className={`${styles.featureItem} ${styles.featureItemIncluded}`}
+                              >
+                                <span
+                                  className={`${styles.featureIcon} ${styles.featureIconIncluded}`}
+                                >
+                                  <FaCheck />
+                                </span>
+                                <span>{benefit}</span>
+                              </li>
+                            ))}
+                          </ul>
+
+                          <Link
+                            to="/register"
+                            className={`${styles.planButton} ${
+                              featured
+                                ? styles.planButtonFeatured
+                                : styles.planButtonNeutral
+                            }`}
+                          >
+                            {plan.type === "group"
+                              ? "Solicitar Paquete"
+                              : "Comenzar Ahora"}
+                          </Link>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
+            </div>
+          ) : null}
 
           <div className={styles.trustBlock}>
             <p className={styles.trustText}>
-              Mas de <strong>10,000+</strong> miembros activos confian en
-              nosotros
+              Planes sincronizados con <strong>MembershipPlans</strong> para
+              mostrar precios y vigencias reales
             </p>
             <div className={styles.trustRating}>
               <div className={styles.trustStars} aria-hidden="true">
@@ -428,7 +604,7 @@ export default function SuscripcionesPage() {
                   <FaStar key={`trust-star-${index}`} />
                 ))}
               </div>
-              <span>4.9/5 valoracion</span>
+              <span>Informacion actualizada</span>
             </div>
           </div>
         </div>

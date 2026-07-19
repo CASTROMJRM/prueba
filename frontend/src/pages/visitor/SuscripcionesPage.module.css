@@ -250,6 +250,58 @@
   padding: 0 0 6.5rem;
 }
 
+.plansContent {
+  display: grid;
+  gap: 3.8rem;
+}
+
+.planGroup {
+  display: grid;
+  gap: 1.65rem;
+}
+
+.planGroupHeader {
+  display: grid;
+  gap: 0.55rem;
+  max-width: 720px;
+}
+
+.planGroupKicker {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 34px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  font-family: var(--font-ui, "Manrope", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.planGroupTitle {
+  margin: 0;
+  color: #070707;
+  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-size: clamp(1.75rem, 3vw, 2.45rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+}
+
+.planGroupDescription {
+  max-width: 640px;
+  margin: 0;
+  color: #64748b;
+  font-family: var(--font-body, "Manrope", sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
 .sectionHeader,
 .sectionHeaderDark {
   display: grid;
@@ -326,6 +378,75 @@
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: -0.01em;
+}
+
+.planState {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 2.2rem;
+  border: 1px dashed rgba(15, 23, 42, 0.16);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #475569;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+}
+
+.planStateIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  font-size: 1.2rem;
+}
+
+.planState strong {
+  color: #0f172a;
+  font-family: var(--font-ui, "Manrope", sans-serif);
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.planState p {
+  max-width: 520px;
+  margin: 0;
+  font-family: var(--font-body, "Manrope", sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.planStateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: #050505;
+  color: #ffffff;
+  font-family: var(--font-ui, "Manrope", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    background 0.28s ease;
+}
+
+.planStateButton:hover {
+  transform: translateY(-2px);
+  background: #dc2626;
+  box-shadow: 0 14px 28px rgba(239, 68, 68, 0.2);
 }
 
 .plansGrid {
@@ -417,6 +538,37 @@
   gap: 1rem;
 }
 
+.planMetaGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.planMetaPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 34px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.05);
+  color: #475569;
+  font-family: var(--font-ui, "Manrope", sans-serif);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.planCardDark .planMetaPill {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(226, 232, 240, 0.82);
+}
+
+.planMetaPill svg {
+  color: #ef4444;
+  font-size: 0.82rem;
+}
+
 .planIconWrap {
   display: inline-flex;
   align-items: center;
@@ -463,6 +615,7 @@
 .planPriceLine {
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 0.35rem;
 }
 
@@ -479,6 +632,7 @@
   font-family: var(--font-body, "Manrope", sans-serif);
   font-size: 1rem;
   font-weight: 700;
+  line-height: 1.35;
 }
 
 .planCardDark .planPriceSuffix {

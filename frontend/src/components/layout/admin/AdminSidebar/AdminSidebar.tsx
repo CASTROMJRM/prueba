@@ -5,6 +5,7 @@ import {
   FaBoxOpen,
   FaBoxes,
   FaChartBar,
+  FaChartLine,
   FaChevronRight,
   FaCog,
   FaDatabase,
@@ -16,6 +17,7 @@ import {
   FaServer,
   FaTags,
   FaThLarge,
+  FaUserCheck,
   FaUsers,
 } from "react-icons/fa";
 import Logo from "../../../../assets/LogoP.png";
@@ -23,10 +25,20 @@ import Logo from "../../../../assets/LogoP.png";
 const topItems = [
   { to: "/admin", label: "Resumen", icon: <FaChartBar /> },
   { to: "/admin/users", label: "Usuarios", icon: <FaUsers /> },
+  {
+    to: "/admin/client-renewal-prediction",
+    label: "Renovacion clientes",
+    icon: <FaUserCheck />,
+  },
 ];
 
 const catalogItems = [
   { to: "/admin/products", label: "Productos", icon: <FaBoxOpen /> },
+  {
+    to: "/admin/sales-prediction",
+    label: "Prediccion ventas",
+    icon: <FaChartLine />,
+  },
   { to: "/admin/brands", label: "Marcas", icon: <FaTags /> },
   { to: "/admin/categories", label: "Categorias", icon: <FaThLarge /> },
 ];

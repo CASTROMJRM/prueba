@@ -123,6 +123,47 @@ function getMethodProvider(method: PaymentMethod) {
   return "none";
 }
 
+const statusLabels: Record<string, string> = {
+  active: "Activo",
+  accepted: "Aceptado",
+  approved: "Aprobado",
+  invited: "Invitado",
+  pending: "Pendiente",
+  pending_approval: "Pendiente de aprobación",
+  payment_confirmed: "Pago confirmado",
+  payment_pending: "Pago pendiente",
+};
+
+function getReadableStatus(status: string | null | undefined) {
+  if (!status) {
+    return "Sin estado";
+  }
+
+  return statusLabels[status] ?? status.replace(/_/g, " ");
+}
+
+function isReadyStatus(status: string) {
+  return ["accepted", "approved", "active"].includes(status);
+}
+
+function formatDate(value: string | null | undefined) {
+  if (!value) {
+    return "Sin fecha";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("es-MX", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
 export default function AdminSuscripcionesPage() {
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -162,6 +203,20 @@ export default function AdminSuscripcionesPage() {
     () => plans.filter((plan) => plan.type === "group" && plan.isActive),
     [plans]
   );
+
+  const selectedIndividualPlan = useMemo(
+    () => individualPlans.find((plan) => plan.id === selectedIndividualPlanId),
+    [individualPlans, selectedIndividualPlanId]
+  );
+
+  const selectedGroupPlan = useMemo(
+    () => groupPlans.find((plan) => plan.id === selectedGroupPlanId),
+    [groupPlans, selectedGroupPlanId]
+  );
+
+  const expectedGroupGuests = selectedGroupPlan
+    ? Math.max(Number(selectedGroupPlan.maxPeople) - 1, 0)
+    : 0;
 
   const filteredPlans = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -457,270 +512,278 @@ export default function AdminSuscripcionesPage() {
         </article>
       </div>
 
-      <div className={styles.contentGrid}>
-        <main className={styles.mainPanel}>
-          <section className={styles.panelCard}>
-            <div className={styles.sectionHeader}>
-              <div>
-                <span className={styles.detailEyebrow}>Catálogo real</span>
-                <h2 className={styles.detailTitle}>Planes disponibles</h2>
-                <p className={styles.sectionText}>
-                  Estos planes vienen desde la tabla MembershipPlans.
-                </p>
-              </div>
+      <section className={`${styles.panelCard} ${styles.workflowPanel}`}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <span className={styles.detailEyebrow}>Guía rápida</span>
+            <h2 className={styles.detailTitle}>Flujo para administrar suscripciones</h2>
+            <p className={styles.sectionText}>
+              Trabaja de arriba hacia abajo: primero valida el plan, después
+              registra el pago y al final revisa si hay paquetes por aprobar.
+            </p>
+          </div>
+        </div>
 
-              <label className={styles.searchBox}>
-                <FaSearch />
-                <input
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Buscar plan..."
-                />
-              </label>
+        <div className={styles.workflowGrid}>
+          <article className={styles.workflowCard}>
+            <span className={styles.workflowNumber}>1</span>
+            <div>
+              <strong>Revisa catálogo</strong>
+              <p>Confirma precio, duración y tipo antes de registrar el pago.</p>
             </div>
+          </article>
 
-            {loading ? (
-              <div className={styles.emptyStateCard}>Cargando planes...</div>
-            ) : filteredPlans.length > 0 ? (
-              <div className={styles.tableWrap}>
-                <table className={styles.adminTable}>
-                  <thead>
-                    <tr>
-                      <th>Plan</th>
-                      <th>Tipo</th>
-                      <th>Duración</th>
-                      <th>Precio</th>
-                      <th>Personas</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredPlans.map((plan) => (
-                      <tr key={plan.id}>
-                        <td>
-                          <strong>{plan.name}</strong>
-                          <p>{plan.description}</p>
-                        </td>
-                        <td>{getPlanLabel(plan)}</td>
-                        <td>{plan.durationDays} días</td>
-                        <td>
-                          <strong>{formatCurrency(plan.price)}</strong>
-                          {plan.type === "group" ? (
-                            <p>{formatCurrency(plan.pricePerPerson)} c/u</p>
-                          ) : null}
-                        </td>
-                        <td>
-                          {plan.minPeople === plan.maxPeople
-                            ? plan.maxPeople
-                            : `${plan.minPeople}-${plan.maxPeople}`}
-                        </td>
-                        <td>
-                          <span
-                            className={
-                              plan.isActive
-                                ? styles.statusActive
-                                : styles.statusInactive
-                            }
-                          >
-                            {plan.isActive ? "Activo" : "Inactivo"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className={styles.emptyStateCard}>
-                No hay planes que coincidan con la búsqueda.
-              </div>
-            )}
-          </section>
-
-          <section className={styles.panelCard}>
-            <div className={styles.sectionHeader}>
-              <div>
-                <span className={styles.detailEyebrow}>Paquetes</span>
-                <h2 className={styles.detailTitle}>Paquetes pendientes</h2>
-                <p className={styles.sectionText}>
-                  Aquí se aprueban paquetes cuando los integrantes ya aceptaron.
-                </p>
-              </div>
+          <article className={styles.workflowCard}>
+            <span className={styles.workflowNumber}>2</span>
+            <div>
+              <strong>Pago individual</strong>
+              <p>Selecciona cliente, plan, método y referencia del comprobante.</p>
             </div>
+          </article>
 
-            {pendingGroups.length > 0 ? (
-              <div className={styles.cardStack}>
-                {pendingGroups.map((group) => {
-                  const members = group.members ?? [];
-                  const acceptedCount = members.filter((member) =>
-                    ["accepted", "approved", "active"].includes(member.status)
-                  ).length;
+          <article className={styles.workflowCard}>
+            <span className={styles.workflowNumber}>3</span>
+            <div>
+              <strong>Pago grupal</strong>
+              <p>Elige titular, paquete y agrega los correos de integrantes.</p>
+            </div>
+          </article>
 
-                  return (
-                    <article key={group.id} className={styles.detailCard}>
-                      <div className={styles.detailHeader}>
-                        <div>
-                          <span className={styles.detailEyebrow}>
-                            {group.status}
-                          </span>
-                          <h3 className={styles.detailTitle}>
-                            {group.plan?.name ?? "Paquete grupal"}
-                          </h3>
-                          <p className={styles.sectionText}>
-                            Titular: {group.owner?.email ?? "Sin titular"}
-                          </p>
-                        </div>
+          <article className={styles.workflowCard}>
+            <span className={styles.workflowNumber}>4</span>
+            <div>
+              <strong>Aprueba paquetes</strong>
+              <p>Activa el paquete cuando todos los integrantes estén listos.</p>
+            </div>
+          </article>
+        </div>
+      </section>
 
-                        <button
-                          type="button"
-                          className={styles.inlinePrimaryBtn}
-                          onClick={() => void handleApproveGroup(group.id)}
-                          disabled={
-                            approvingGroupId === group.id ||
-                            acceptedCount !== Number(group.memberLimit)
-                          }
-                        >
-                          <FaCheckCircle />
-                          {approvingGroupId === group.id
-                            ? "Aprobando..."
-                            : "Aprobar paquete"}
-                        </button>
-                      </div>
+      <section className={`${styles.panelCard} ${styles.catalogPanel}`}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <span className={styles.detailEyebrow}>Catálogo real</span>
+            <h2 className={styles.detailTitle}>Planes disponibles</h2>
+            <p className={styles.sectionText}>
+              Consulta los planes cargados desde MembershipPlans antes de
+              registrar una membresía.
+            </p>
+          </div>
 
-                      <div className={styles.statsGrid}>
-                        <div className={styles.miniStatCard}>
-                          <span>Pago</span>
-                          <strong>{formatCurrency(group.totalAmount)}</strong>
-                        </div>
-                        <div className={styles.miniStatCard}>
-                          <span>Integrantes</span>
-                          <strong>
-                            {acceptedCount}/{group.memberLimit}
-                          </strong>
-                        </div>
-                        <div className={styles.miniStatCard}>
-                          <span>Vigencia</span>
-                          <strong>
-                            {group.startsAt ?? "Sin iniciar"} -{" "}
-                            {group.endsAt ?? "Sin finalizar"}
-                          </strong>
-                        </div>
-                      </div>
+          <label className={styles.searchBox}>
+            <FaSearch />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar plan..."
+            />
+          </label>
+        </div>
 
-                      <div className={styles.memberList}>
-                        {members.map((member) => (
-                          <div key={member.id} className={styles.memberItem}>
-                            <span>
-                              <FaEnvelope /> {member.invitedEmail}
-                            </span>
-                            <strong>{member.status}</strong>
-                          </div>
-                        ))}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className={styles.emptyStateCard}>
-                No hay paquetes pendientes por ahora.
-              </div>
-            )}
-          </section>
-        </main>
+        <div className={styles.sectionHelp}>
+          <FaSearch />
+          <span>
+            Usa el buscador para encontrar por nombre, slug o tipo. El precio
+            mostrado aquí es el que se enviará al registrar el pago.
+          </span>
+        </div>
 
-        <aside className={styles.sidePanel}>
-          <section className={styles.detailCard}>
+        {loading ? (
+          <div className={styles.emptyStateCard}>Cargando planes...</div>
+        ) : filteredPlans.length > 0 ? (
+          <div className={styles.tableWrap}>
+            <table className={styles.adminTable}>
+              <thead>
+                <tr>
+                  <th>Plan</th>
+                  <th>Tipo</th>
+                  <th>Duración</th>
+                  <th>Precio</th>
+                  <th>Personas</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPlans.map((plan) => (
+                  <tr key={plan.id}>
+                    <td>
+                      <strong>{plan.name}</strong>
+                      <p>{plan.description}</p>
+                    </td>
+                    <td>{getPlanLabel(plan)}</td>
+                    <td>{plan.durationDays} días</td>
+                    <td>
+                      <strong>{formatCurrency(plan.price)}</strong>
+                      {plan.type === "group" ? (
+                        <p>{formatCurrency(plan.pricePerPerson)} c/u</p>
+                      ) : null}
+                    </td>
+                    <td>
+                      {plan.minPeople === plan.maxPeople
+                        ? plan.maxPeople
+                        : `${plan.minPeople}-${plan.maxPeople}`}
+                    </td>
+                    <td>
+                      <span
+                        className={
+                          plan.isActive
+                            ? styles.statusActive
+                            : styles.statusInactive
+                        }
+                      >
+                        {plan.isActive ? "Activo" : "Inactivo"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className={styles.emptyStateCard}>
+            No hay planes que coincidan con la búsqueda.
+          </div>
+        )}
+      </section>
+
+      <section className={styles.sectionBlock}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <span className={styles.detailEyebrow}>Registro</span>
+            <h2 className={styles.detailTitle}>Registrar una suscripción</h2>
+            <p className={styles.sectionText}>
+              Usa el formulario individual para una sola persona o el grupal
+              cuando el pago cubre a varios clientes.
+            </p>
+          </div>
+        </div>
+
+        <div className={styles.registrationGrid}>
+          <article className={`${styles.detailCard} ${styles.formCard}`}>
             <div className={styles.detailHeader}>
               <div>
                 <span className={styles.detailEyebrow}>Pago manual</span>
                 <h2 className={styles.detailTitle}>Membresía individual</h2>
                 <p className={styles.sectionText}>
-                  Úsalo para visita, semana, quincena, mensualidad, semestre o
-                  anualidad.
+                  Para visitas, semana, quincena, mensualidad, semestre o
+                  anualidad de un solo cliente.
                 </p>
               </div>
             </div>
 
+            <div className={styles.formNotice}>
+              <FaCreditCard />
+              <span>
+                Selecciona el cliente y el plan. Al registrar el pago, la
+                membresía queda activa con la fecha elegida.
+              </span>
+            </div>
+
             <div className={styles.formStack}>
-              <label>
-                Cliente
-                <select
-                  value={selectedUserId}
-                  onChange={(event) => setSelectedUserId(event.target.value)}
-                >
-                  <option value="">Selecciona cliente</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.email}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div className={styles.formSection}>
+                <h3>Cliente y plan</h3>
+                <div className={styles.formGrid}>
+                  <label>
+                    Cliente
+                    <select
+                      value={selectedUserId}
+                      onChange={(event) => setSelectedUserId(event.target.value)}
+                    >
+                      <option value="">Selecciona cliente</option>
+                      {clients.map((client) => (
+                        <option key={client.id} value={client.id}>
+                          {client.email}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
 
-              <label>
-                Plan
-                <select
-                  value={selectedIndividualPlanId}
-                  onChange={(event) =>
-                    setSelectedIndividualPlanId(event.target.value)
-                  }
-                >
-                  <option value="">Selecciona plan</option>
-                  {individualPlans.map((plan) => (
-                    <option key={plan.id} value={plan.id}>
-                      {plan.name} - {formatCurrency(plan.price)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  <label>
+                    Plan
+                    <select
+                      value={selectedIndividualPlanId}
+                      onChange={(event) =>
+                        setSelectedIndividualPlanId(event.target.value)
+                      }
+                    >
+                      <option value="">Selecciona plan</option>
+                      {individualPlans.map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name} - {formatCurrency(plan.price)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
 
-              <label>
-                Método
-                <select
-                  value={individualMethod}
-                  onChange={(event) =>
-                    setIndividualMethod(event.target.value as PaymentMethod)
-                  }
-                >
-                  <option value="cash">Efectivo</option>
-                  <option value="transfer">Transferencia</option>
-                  <option value="card_terminal">
-                    Tarjeta presencial / Mercado Pago
-                  </option>
-                </select>
-              </label>
+              <div className={styles.formSection}>
+                <h3>Datos del pago</h3>
+                <div className={styles.formGrid}>
+                  <label>
+                    Método
+                    <select
+                      value={individualMethod}
+                      onChange={(event) =>
+                        setIndividualMethod(event.target.value as PaymentMethod)
+                      }
+                    >
+                      <option value="cash">Efectivo</option>
+                      <option value="transfer">Transferencia</option>
+                      <option value="card_terminal">
+                        Tarjeta presencial / Mercado Pago
+                      </option>
+                    </select>
+                  </label>
 
-              <label>
-                Fecha de inicio
-                <input
-                  type="date"
-                  value={individualStartsAt}
-                  onChange={(event) => setIndividualStartsAt(event.target.value)}
-                />
-              </label>
+                  <label>
+                    Fecha de inicio
+                    <input
+                      type="date"
+                      value={individualStartsAt}
+                      onChange={(event) =>
+                        setIndividualStartsAt(event.target.value)
+                      }
+                    />
+                  </label>
 
-              <label>
-                Referencia
-                <input
-                  value={individualReference}
-                  onChange={(event) => setIndividualReference(event.target.value)}
-                  placeholder="Folio, nota o referencia del pago"
-                />
-              </label>
+                  <label className={styles.fieldFull}>
+                    Referencia
+                    <input
+                      value={individualReference}
+                      onChange={(event) =>
+                        setIndividualReference(event.target.value)
+                      }
+                      placeholder="Folio, nota o referencia del pago"
+                    />
+                  </label>
 
-              <label>
-                Notas
-                <textarea
-                  value={individualNotes}
-                  onChange={(event) => setIndividualNotes(event.target.value)}
-                  placeholder="Observaciones del pago"
-                />
-              </label>
+                  <label className={styles.fieldFull}>
+                    Notas
+                    <textarea
+                      value={individualNotes}
+                      onChange={(event) => setIndividualNotes(event.target.value)}
+                      placeholder="Observaciones del pago"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className={styles.planSummary}>
+                <span>Plan seleccionado</span>
+                <strong>
+                  {selectedIndividualPlan
+                    ? `${selectedIndividualPlan.name} - ${formatCurrency(
+                        selectedIndividualPlan.price
+                      )}`
+                    : "Selecciona un plan individual"}
+                </strong>
+                <p>Este registro activa la membresía del cliente seleccionado.</p>
+              </div>
 
               <button
                 type="button"
-                className={styles.inlinePrimaryBtn}
+                className={`${styles.inlinePrimaryBtn} ${styles.fullAction}`}
                 onClick={() => void handleCreateIndividualPayment()}
                 disabled={savingIndividual}
               >
@@ -728,105 +791,140 @@ export default function AdminSuscripcionesPage() {
                 {savingIndividual ? "Registrando..." : "Registrar pago"}
               </button>
             </div>
-          </section>
+          </article>
 
-          <section className={styles.detailCard}>
+          <article className={`${styles.detailCard} ${styles.formCard}`}>
             <div className={styles.detailHeader}>
               <div>
                 <span className={styles.detailEyebrow}>Pago grupal</span>
                 <h2 className={styles.detailTitle}>Paquete por correos</h2>
                 <p className={styles.sectionText}>
-                  Registra el titular y agrega correos de los demás integrantes.
+                  Para paquetes de 2, 3 o 4 personas con un titular y sus
+                  integrantes invitados.
                 </p>
               </div>
             </div>
 
+            <div className={styles.formNotice}>
+              <FaUsers />
+              <span>
+                El titular queda como responsable del pago. Agrega solo los
+                correos de las personas adicionales.
+              </span>
+            </div>
+
             <div className={styles.formStack}>
-              <label>
-                Titular
-                <select
-                  value={ownerUserId}
-                  onChange={(event) => setOwnerUserId(event.target.value)}
-                >
-                  <option value="">Selecciona titular</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.email}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div className={styles.formSection}>
+                <h3>Titular y paquete</h3>
+                <div className={styles.formGrid}>
+                  <label>
+                    Titular
+                    <select
+                      value={ownerUserId}
+                      onChange={(event) => setOwnerUserId(event.target.value)}
+                    >
+                      <option value="">Selecciona titular</option>
+                      {clients.map((client) => (
+                        <option key={client.id} value={client.id}>
+                          {client.email}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
 
-              <label>
-                Paquete
-                <select
-                  value={selectedGroupPlanId}
-                  onChange={(event) => setSelectedGroupPlanId(event.target.value)}
-                >
-                  <option value="">Selecciona paquete</option>
-                  {groupPlans.map((plan) => (
-                    <option key={plan.id} value={plan.id}>
-                      {plan.name} - {formatCurrency(plan.price)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  <label>
+                    Paquete
+                    <select
+                      value={selectedGroupPlanId}
+                      onChange={(event) =>
+                        setSelectedGroupPlanId(event.target.value)
+                      }
+                    >
+                      <option value="">Selecciona paquete</option>
+                      {groupPlans.map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name} - {formatCurrency(plan.price)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
 
-              <label>
-                Método
-                <select
-                  value={groupMethod}
-                  onChange={(event) =>
-                    setGroupMethod(event.target.value as PaymentMethod)
-                  }
-                >
-                  <option value="cash">Efectivo</option>
-                  <option value="transfer">Transferencia</option>
-                  <option value="card_terminal">
-                    Tarjeta presencial / Mercado Pago
-                  </option>
-                </select>
-              </label>
+              <div className={styles.formSection}>
+                <h3>Integrantes y pago</h3>
+                <div className={styles.formGrid}>
+                  <label>
+                    Método
+                    <select
+                      value={groupMethod}
+                      onChange={(event) =>
+                        setGroupMethod(event.target.value as PaymentMethod)
+                      }
+                    >
+                      <option value="cash">Efectivo</option>
+                      <option value="transfer">Transferencia</option>
+                      <option value="card_terminal">
+                        Tarjeta presencial / Mercado Pago
+                      </option>
+                    </select>
+                  </label>
 
-              <label>
-                Fecha de inicio
-                <input
-                  type="date"
-                  value={groupStartsAt}
-                  onChange={(event) => setGroupStartsAt(event.target.value)}
-                />
-              </label>
+                  <label>
+                    Fecha de inicio
+                    <input
+                      type="date"
+                      value={groupStartsAt}
+                      onChange={(event) => setGroupStartsAt(event.target.value)}
+                    />
+                  </label>
 
-              <label>
-                Correos de integrantes
-                <textarea
-                  value={memberEmailsText}
-                  onChange={(event) => setMemberEmailsText(event.target.value)}
-                  placeholder="correo2@gmail.com&#10;correo3@gmail.com&#10;correo4@gmail.com"
-                />
-              </label>
+                  <label className={styles.fieldFull}>
+                    Correos de integrantes
+                    <textarea
+                      value={memberEmailsText}
+                      onChange={(event) => setMemberEmailsText(event.target.value)}
+                      placeholder="correo2@gmail.com&#10;correo3@gmail.com&#10;correo4@gmail.com"
+                    />
+                  </label>
 
-              <label>
-                Referencia
-                <input
-                  value={groupReference}
-                  onChange={(event) => setGroupReference(event.target.value)}
-                  placeholder="Pago paquete con terminal Mercado Pago"
-                />
-              </label>
+                  <label className={styles.fieldFull}>
+                    Referencia
+                    <input
+                      value={groupReference}
+                      onChange={(event) => setGroupReference(event.target.value)}
+                      placeholder="Pago paquete con terminal Mercado Pago"
+                    />
+                  </label>
 
-              <label>
-                Notas
-                <textarea
-                  value={groupNotes}
-                  onChange={(event) => setGroupNotes(event.target.value)}
-                  placeholder="Observaciones del paquete"
-                />
-              </label>
+                  <label className={styles.fieldFull}>
+                    Notas
+                    <textarea
+                      value={groupNotes}
+                      onChange={(event) => setGroupNotes(event.target.value)}
+                      placeholder="Observaciones del paquete"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className={styles.planSummary}>
+                <span>Límite del paquete</span>
+                <strong>
+                  {selectedGroupPlan
+                    ? `${selectedGroupPlan.maxPeople} personas en total`
+                    : "Selecciona un paquete grupal"}
+                </strong>
+                <p>
+                  {selectedGroupPlan
+                    ? `Puedes agregar hasta ${expectedGroupGuests} correos además del titular.`
+                    : "Al registrar, el paquete quedará pendiente de aceptación."}
+                </p>
+              </div>
 
               <button
                 type="button"
-                className={styles.inlinePrimaryBtn}
+                className={`${styles.inlinePrimaryBtn} ${styles.fullAction}`}
                 onClick={() => void handleCreateGroupPayment()}
                 disabled={savingGroup}
               >
@@ -834,9 +932,126 @@ export default function AdminSuscripcionesPage() {
                 {savingGroup ? "Registrando..." : "Registrar paquete"}
               </button>
             </div>
-          </section>
-        </aside>
-      </div>
+          </article>
+        </div>
+      </section>
+
+      <section className={`${styles.panelCard} ${styles.pendingPanel}`}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <span className={styles.detailEyebrow}>Validación</span>
+            <h2 className={styles.detailTitle}>Paquetes pendientes</h2>
+            <p className={styles.sectionText}>
+              Revisa el estado de cada integrante. El botón se habilita cuando
+              todos aceptaron y tienen cuenta registrada.
+            </p>
+          </div>
+        </div>
+
+        <div className={styles.sectionHelp}>
+          <FaCheckCircle />
+          <span>
+            Antes de aprobar, confirma que el pago esté correcto y que el
+            contador de integrantes coincida con el límite del paquete.
+          </span>
+        </div>
+
+        {pendingGroups.length > 0 ? (
+          <div className={styles.cardStack}>
+            {pendingGroups.map((group) => {
+              const members = group.members ?? [];
+              const acceptedCount = members.filter((member) =>
+                isReadyStatus(member.status)
+              ).length;
+              const isReadyToApprove = acceptedCount === Number(group.memberLimit);
+
+              return (
+                <article key={group.id} className={styles.pendingCard}>
+                  <div className={styles.pendingHeader}>
+                    <div>
+                      <span className={styles.detailEyebrow}>
+                        {getReadableStatus(group.status)}
+                      </span>
+                      <h3 className={styles.detailTitle}>
+                        {group.plan?.name ?? "Paquete grupal"}
+                      </h3>
+                      <p className={styles.sectionText}>
+                        Titular: {group.owner?.email ?? "Sin titular"}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      className={styles.inlinePrimaryBtn}
+                      onClick={() => void handleApproveGroup(group.id)}
+                      disabled={approvingGroupId === group.id || !isReadyToApprove}
+                    >
+                      <FaCheckCircle />
+                      {approvingGroupId === group.id
+                        ? "Aprobando..."
+                        : "Aprobar paquete"}
+                    </button>
+                  </div>
+
+                  <div className={styles.groupMetrics}>
+                    <div className={styles.miniStatCard}>
+                      <span>Pago registrado</span>
+                      <strong>{formatCurrency(group.totalAmount)}</strong>
+                    </div>
+                    <div className={styles.miniStatCard}>
+                      <span>Integrantes listos</span>
+                      <strong>
+                        {acceptedCount}/{group.memberLimit}
+                      </strong>
+                    </div>
+                    <div className={styles.miniStatCard}>
+                      <span>Vigencia</span>
+                      <strong>
+                        {formatDate(group.startsAt)} - {formatDate(group.endsAt)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      isReadyToApprove ? styles.readyNote : styles.warningNote
+                    }
+                  >
+                    {isReadyToApprove
+                      ? "El paquete está listo para aprobarse."
+                      : "Aún faltan integrantes por aceptar o completar su registro."}
+                  </div>
+
+                  <div className={styles.memberList}>
+                    {members.map((member) => {
+                      const isReady = isReadyStatus(member.status);
+
+                      return (
+                        <div key={member.id} className={styles.memberItem}>
+                          <span>
+                            <FaEnvelope /> {member.invitedEmail}
+                          </span>
+                          <strong
+                            className={
+                              isReady ? styles.statusReady : styles.statusWaiting
+                            }
+                          >
+                            {getReadableStatus(member.status)}
+                          </strong>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className={styles.emptyStateCard}>
+            No hay paquetes pendientes por ahora.
+          </div>
+        )}
+      </section>
     </section>
   );
 }
