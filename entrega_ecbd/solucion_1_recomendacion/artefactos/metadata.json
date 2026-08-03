@@ -1,0 +1,29 @@
+{
+  "solution": "Solución 1 - Recomendación de productos por similitud del coseno",
+  "methodology": "CRISP-DM",
+  "dataset": "recomendacion.csv",
+  "random_state": 42,
+  "products_count": 160,
+  "columns_count": 16,
+  "terms_count": 614,
+  "tfidf_shape": [
+    160,
+    614
+  ],
+  "evaluation": {
+    "productos_evaluados": 160,
+    "recomendaciones_top5_generadas": 800,
+    "similitud_minima_top5": 0.23112,
+    "similitud_media_top5": 0.507349,
+    "similitud_mediana_top5": 0.491848,
+    "similitud_maxima_top5": 0.896772,
+    "productos_con_al_menos_una_recomendacion_top5": 160,
+    "cobertura_top5_porcentaje": 100.0
+  },
+  "artifacts": {
+    "vectorizer": "vectorizer.joblib",
+    "matrix": "matriz_tfidf.npz",
+    "products": "productos_recomendacion.json",
+    "metadata": "metadata.json"
+  }
+}

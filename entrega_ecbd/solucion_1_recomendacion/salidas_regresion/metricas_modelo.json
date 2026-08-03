@@ -1,0 +1,19 @@
+{
+  "modelo": "Random Forest",
+  "MAE": 5.161492304728662,
+  "RMSE": 6.878749270157178,
+  "R2": 0.6176870980515605,
+  "sMAPE_%": 36.139954992968384,
+  "periodo_prueba_inicio": "2025-12",
+  "periodo_prueba_fin": "2026-05",
+  "variables_predictoras": [
+    "producto",
+    "ventas_mes_anterior",
+    "promedio_movil_ventas_3_meses",
+    "promedio_movil_ventas_6_meses",
+    "promedio_movil_ventas_12_meses",
+    "vistas_producto_mes_anterior",
+    "promedio_movil_vistas_3_meses"
+  ],
+  "variable_objetivo": "ventas_mes_siguiente"
+}
